@@ -29,6 +29,8 @@ ffi.cdef(
         r"\bCV_DEFAULT\([^)]+\)",
         "",
     """
+typedef signed char schar;
+
 /****************************************************************************************\
 *                                   Dynamic Data structures                              *
 \****************************************************************************************/
@@ -39,6 +41,11 @@ typedef struct CvMemBlock { ...; } CvMemBlock;
 typedef struct CvMemStorage { ...; } CvMemStorage;
 typedef struct CvMemStoragePos { ...; } CvMemStoragePos;
 
+/** Creates new memory storage.
+   block_size == 0 means that default,
+   somewhat optimal size, is used (currently, it is 64K) */
+CVAPI(CvMemStorage*)  cvCreateMemStorage( int block_size CV_DEFAULT(0));
+
 /** @brief This is the "metatype" used *only* as a function parameter.
 
 It denotes that the function accepts arrays of multiple types, such as IplImage*, CvMat* or even
@@ -47,13 +54,74 @@ bytes of the header. In C++ interface the role of CvArr is played by InputArray 
  */
 typedef void CvArr;
 
-typedef struct CvSeq { ...; } CvSeq;
+/*********************************** Sequence *******************************************/
+
+typedef struct CvSeqBlock
+{
+    struct CvSeqBlock*  prev; /**< Previous sequence block.                   */
+    struct CvSeqBlock*  next; /**< Next sequence block.                       */
+  int    start_index;         /**< Index of the first element in the block +  */
+                              /**< sequence->first->start_index.              */
+    int    count;             /**< Number of elements in the block.           */
+    schar* data;              /**< Pointer to the first element of the block. */
+}
+CvSeqBlock;
+
+typedef struct CvSeq {
+    int       total;          /**< Total number of elements.            */  \
+    int       elem_size;      /**< Size of sequence element in bytes.   */  \
+    schar*    block_max;      /**< Maximal bound of the last block.     */  \
+    schar*    ptr;            /**< Current write pointer.               */  \
+    int       delta_elems;    /**< Grow seq this many at a time.        */  \
+    CvMemStorage* storage;    /**< Where the seq is stored.             */  \
+    CvSeqBlock* free_blocks;  /**< Free blocks list.                    */  \
+    CvSeqBlock* first;        /**< Pointer to the first sequence block. */
+    ...;
+} CvSeq;
+
+/** Retrieves pointer to specified sequence element.
+   Negative indices are supported and mean counting from the end
+   (e.g -1 means the last sequence element) */
+CVAPI(schar*)  cvGetSeqElem( const CvSeq* seq, int index );
 
 typedef struct CvSize
 {
     int width;
     int height;
 } CvSize;
+
+/** @brief Loads an object from a file.
+
+The function loads an object from a file. It basically reads the specified file, find the first
+top-level node and calls cvRead for that node. If the file node does not have type information or
+the type information can not be found by the type name, the function returns NULL. After the object
+is loaded, the file storage is closed and all the temporary buffers are deleted. Thus, to load a
+dynamic structure, such as a sequence, contour, or graph, one should pass a valid memory storage
+destination to the function.
+@param filename File name
+@param memstorage Memory storage for dynamic structures, such as CvSeq or CvGraph . It is not used
+for matrices or images.
+@param name Optional object name. If it is NULL, the first top-level object in the storage will be
+loaded.
+@param real_name Optional output parameter that will contain the name of the loaded object
+(useful if name=NULL )
+ */
+CVAPI(void*) cvLoad( const char* filename,
+                     CvMemStorage* memstorage CV_DEFAULT(NULL),
+                     const char* name CV_DEFAULT(NULL),
+                     const char** real_name CV_DEFAULT(NULL) );
+
+/*************************************** CvRect *****************************************/
+/** @sa Rect_ */
+typedef struct CvRect
+{
+    int x;
+    int y;
+    int width;
+    int height;
+
+}
+CvRect;
 
 /******************************* CvPoint and variants ***********************************/
 
