@@ -1,6 +1,9 @@
 from _opencv import ffi, lib
 
 
+ESCAPE = ord("\x1b")
+
+
 def fourcc(code):
     assert len(code) == 4
     return sum(
@@ -27,12 +30,11 @@ writer = lib.cvCreateVideoWriter(
 lib.cvNamedWindow("Example", lib.CV_WINDOW_AUTOSIZE)
 
 
-while lib.cvWaitKey(33) != 27:
+WAIT_MILLISECONDS = 20
+
+while lib.cvWaitKey(WAIT_MILLISECONDS) != ESCAPE:
     frame = lib.cvQueryFrame(capture)
     lib.cvWriteFrame(writer, frame)
     lib.cvShowImage("Example", frame)
 
-print repr(writer)
-lib.cvReleaseVideoWriter(ffi.addressof(writer))
-lib.cvReleaseCapture(ffi.addressof(capture))
 lib.cvDestroyWindow("Example");
