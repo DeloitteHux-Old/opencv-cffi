@@ -45,10 +45,8 @@ cascade = lib.cvLoadHaarClassifierCascade(
 storage = lib.cvCreateMemStorage(0)
 
 
-for _ in xrange(10):
+while escape_is_not_pressed():
     frame = lib.cvQueryFrame(capture)
-    lib.cvWriteFrame(writer, frame)
-    lib.cvShowImage("Example", frame)
     objects = lib.cvHaarDetectObjects(
         frame,
         cascade,
@@ -60,7 +58,26 @@ for _ in xrange(10):
         lib.cvSize(0, 0),
     )
     for i in xrange(objects.total):
-        print ffi.cast("CvRect*", lib.cvGetSeqElem(objects, i))
+        rectangle = ffi.cast("CvRect*", lib.cvGetSeqElem(objects, i))
+
+        top_point = ffi.new("CvPoint *", [rectangle.x, rectangle.y])
+        bottom_point = ffi.new(
+            "CvPoint *",
+            [rectangle.x + rectangle.width, rectangle.y + rectangle.height],
+        )
+
+        lib.cvRectangle(
+            frame,
+            top_point[0],
+            bottom_point[0],
+            lib.cvScalar(255, 0, 0, 0),
+            1,
+            8,
+            0,
+        )
+
+    lib.cvWriteFrame(writer, frame)
+    lib.cvShowImage("Example", frame)
 
 
 lib.cvDestroyWindow("Example");

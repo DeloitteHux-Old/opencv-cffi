@@ -90,6 +90,16 @@ typedef struct CvSize
     int height;
 } CvSize;
 
+/************************************* CvScalar *****************************************/
+/** @sa Scalar_
+ */
+typedef struct CvScalar { double val[4]; } CvScalar;
+
+CvScalar  cvScalar( double val0, double val1 CV_DEFAULT(0),
+                               double val2 CV_DEFAULT(0), double val3 CV_DEFAULT(0));
+CvScalar  cvRealScalar( double val0 );
+CvScalar  cvScalarAll( double val0123 );
+
 /** @brief Loads an object from a file.
 
 The function loads an object from a file. It basically reads the specified file, find the first
@@ -125,10 +135,23 @@ CvRect;
 
 /******************************* CvPoint and variants ***********************************/
 
-typedef struct CvPoint { ...; } CvPoint;
+typedef struct CvPoint {
+    int x;
+    int y;
+} CvPoint;
 
 /** constructs CvSize structure. */
 CvSize  cvSize( int width, int height );
+
+/** @brief Draws a rectangle given two opposite corners of the rectangle (pt1 & pt2)
+
+   if thickness<0 (e.g. thickness == CV_FILLED), the filled box is drawn
+@see cv::rectangle
+*/
+CVAPI(void)  cvRectangle( CvArr* img, CvPoint pt1, CvPoint pt2,
+                          CvScalar color, int thickness CV_DEFAULT(1),
+                          int line_type CV_DEFAULT(8),
+                          int shift CV_DEFAULT(0));
 
 /* "black box" capture structure */
 typedef struct CvCapture CvCapture;
