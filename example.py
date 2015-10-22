@@ -1,12 +1,13 @@
 from _opencv import ffi, lib
+from opencv_cffi.io import Camera
 from opencv_cffi.gui import Window
+from opencv_cffi.utils import _OpenCVSequence
 
 
 ESCAPE = ord("\x1b")
 
 
-capture = lib.cvCreateCameraCapture(0)
-window = Window(name="Example")
+camera = Camera(index=0)
 
 
 def escape_is_pressed(milliseconds=20):
@@ -20,9 +21,11 @@ cascade = lib.cvLoadHaarClassifierCascade(
 
 
 with Window(name="Example") as window:
-    while escape_is_not_pressed():
-        frame = lib.cvQueryFrame(capture)
-        objects = lib.cvHaarDetectObjects(
+    for frame in camera.frames():
+        if escape_is_pressed():
+            break
+
+        raw_objects = lib.cvHaarDetectObjects(
             frame,
             cascade,
             lib.cvCreateMemStorage(0),
@@ -32,8 +35,9 @@ with Window(name="Example") as window:
             lib.cvSize(50, 50),
             lib.cvSize(0, 0),
         )
-        for i in xrange(objects.total):
-            rectangle = ffi.cast("CvRect*", lib.cvGetSeqElem(objects, i))
+        objects = _OpenCVSequence(cv_seq=raw_objects, contents_type="CvRect *")
+        for i in xrange(len(objects)):
+            rectangle = objects[i]
             width, height = rectangle.width, rectangle.height
 
             lib.cvRectangle(
