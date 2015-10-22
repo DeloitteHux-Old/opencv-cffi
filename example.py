@@ -9,8 +9,8 @@ capture = lib.cvCreateCameraCapture(0)
 window = Window(name="Example")
 
 
-def escape_is_not_pressed(milliseconds=20):
-    return lib.cvWaitKey(milliseconds) != ESCAPE
+def escape_is_pressed(milliseconds=20):
+    return lib.cvWaitKey(milliseconds) == ESCAPE
 
 
 cascade = lib.cvLoadHaarClassifierCascade(
@@ -46,5 +46,4 @@ with Window(name="Example") as window:
                 0,
             )
 
-        # lib.cvWriteFrame(writer, frame)
         window.show(frame)

@@ -6,4 +6,4 @@ def fourcc((a, b, c, d)):
 
     """
 
-    return (((((ord(d) << 8) | ord(c)) << 8) | ord(b)) << 8) | ord(a);
+    return (((((ord(d) << 8) | ord(c)) << 8) | ord(b)) << 8) | ord(a)
