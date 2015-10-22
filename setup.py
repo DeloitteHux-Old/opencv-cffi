@@ -31,7 +31,7 @@ setup(
     packages=find_packages(),
     cffi_modules=["opencv_cffi/build.py:ffi"],
     setup_requires=["vcversioner"] + cffi_requirement,
-    install_requires=cffi_requirement,
+    install_requires=["characteristic"] + cffi_requirement,
     vcversioner={"version_module_paths": ["opencv_cffi/_version.py"]},
     author="Magnetic Engineering",
     author_email="Engineering@Magnetic.com",

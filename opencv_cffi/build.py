@@ -404,11 +404,6 @@ CVAPI(CvHaarClassifierCascade*) cvLoadHaarClassifierCascade(
 
 CVAPI(void) cvReleaseHaarClassifierCascade( CvHaarClassifierCascade** cascade );
 
-#define CV_HAAR_DO_CANNY_PRUNING    1
-#define CV_HAAR_SCALE_IMAGE         2
-#define CV_HAAR_FIND_BIGGEST_OBJECT 4
-#define CV_HAAR_DO_ROUGH_SEARCH     8
-
 CVAPI(CvSeq*) cvHaarDetectObjects( const CvArr* image,
                      CvHaarClassifierCascade* cascade, CvMemStorage* storage,
                      double scale_factor CV_DEFAULT(1.1),
