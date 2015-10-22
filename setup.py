@@ -3,6 +3,14 @@ import os
 from setuptools import find_packages, setup
 
 
+try:
+    import __pypy__
+except ImportError:
+    cffi_requirement = ["cffi>=1.0.0"]
+else:
+    cffi_requirement = []
+
+
 with open(os.path.join(os.path.dirname(__file__), "README.rst")) as readme:
     long_description = readme.read()
 
@@ -21,8 +29,9 @@ classifiers = [
 setup(
     name="opencv_cffi",
     packages=find_packages(),
-    py_modules=(),
-    setup_requires=["vcversioner"],
+    cffi_modules=["opencv_cffi/build.py:ffi"],
+    setup_requires=["vcversioner"] + cffi_requirement,
+    install_requires=cffi_requirement,
     vcversioner={"version_module_paths": ["opencv_cffi/_version.py"]},
     author="Magnetic Engineering",
     author_email="Engineering@Magnetic.com",
