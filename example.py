@@ -33,8 +33,8 @@ writer = lib.cvCreateVideoWriter(
 lib.cvNamedWindow("Example", lib.CV_WINDOW_AUTOSIZE)
 
 
-def check_for_escape(milliseconds=20):
-    return lib.cvWaitKey(WAIT_MILLISECONDS) != ESCAPE
+def escape_is_not_pressed(milliseconds=20):
+    return lib.cvWaitKey(milliseconds) != ESCAPE
 
 
 cascade = lib.cvLoadHaarClassifierCascade(
