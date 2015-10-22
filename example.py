@@ -35,9 +35,9 @@ with Window(name="Example") as window:
             lib.cvSize(50, 50),
             lib.cvSize(0, 0),
         )
+
         objects = _OpenCVSequence(cv_seq=raw_objects, contents_type="CvRect *")
-        for i in xrange(len(objects)):
-            rectangle = objects[i]
+        for rectangle in objects:
             width, height = rectangle.width, rectangle.height
 
             lib.cvRectangle(

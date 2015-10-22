@@ -11,6 +11,8 @@ from _opencv import ffi,lib
 )
 class _OpenCVSequence(object):
     def __getitem__(self, index):
+        if index >= len(self):
+            raise IndexError(index)
         return self._casted(lib.cvGetSeqElem(self._cv_seq, index))
 
     def __len__(self):
