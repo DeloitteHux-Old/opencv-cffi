@@ -21,13 +21,13 @@ size = lib.cvSize(
     int(lib.cvGetCaptureProperty(capture, lib.CV_CAP_PROP_FRAME_HEIGHT)),
 )
 
-writer = lib.cvCreateVideoWriter(
-    "/Users/Julian/Desktop/testing123.mpeg",
-    fourcc("PIM1"),
-    30,
-    size,
-    1,
-)
+# writer = lib.cvCreateVideoWriter(
+#     "/Users/Julian/Desktop/testing123.mpeg",
+#     fourcc("PIM1"),
+#     30,
+#     size,
+#     1,
+# )
 
 
 lib.cvNamedWindow("Example", lib.CV_WINDOW_AUTOSIZE)
@@ -65,22 +65,17 @@ while escape_is_not_pressed():
         if is_too_small_to_be_interesting:
             continue
 
-        top_point = ffi.new("CvPoint *", [rectangle.x, rectangle.y])
-        bottom_point = ffi.new(
-            "CvPoint *", [rectangle.x + width, rectangle.y + height],
-        )
-
         lib.cvRectangle(
             frame,
-            top_point[0],
-            bottom_point[0],
+            [rectangle.x, rectangle.y],
+            [rectangle.x + width, rectangle.y + height],
             lib.cvScalar(255, 0, 0, 0),
             1,
             8,
             0,
         )
 
-    lib.cvWriteFrame(writer, frame)
+    # lib.cvWriteFrame(writer, frame)
     lib.cvShowImage("Example", frame)
 
 
