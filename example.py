@@ -1,7 +1,9 @@
+from bp.filepath import FilePath
+
 from _opencv import ffi, lib
 from opencv_cffi.io import Camera
 from opencv_cffi.gui import Window
-from opencv_cffi.utils import _OpenCVSequence
+from opencv_cffi.object_detection import HaarClassifier
 
 
 ESCAPE = ord("\x1b")
@@ -14,10 +16,11 @@ def escape_is_pressed(milliseconds=20):
     return lib.cvWaitKey(milliseconds) == ESCAPE
 
 
-cascade = lib.cvLoadHaarClassifierCascade(
+
+filepath = FilePath(
     "/Users/Julian/Desktop/haarcascades/haarcascade_frontalface_default.xml",
-    lib.cvSize(1, 1),
 )
+classifier = HaarClassifier.from_path(filepath)
 
 
 with Window(name="Example") as window:
@@ -25,19 +28,7 @@ with Window(name="Example") as window:
         if escape_is_pressed():
             break
 
-        raw_objects = lib.cvHaarDetectObjects(
-            frame,
-            cascade,
-            lib.cvCreateMemStorage(0),
-            1.1,
-            4,
-            0,
-            lib.cvSize(50, 50),
-            lib.cvSize(0, 0),
-        )
-
-        objects = _OpenCVSequence(cv_seq=raw_objects, contents_type="CvRect *")
-        for rectangle in objects:
+        for rectangle in classifier.detect_objects(inside=frame):
             width, height = rectangle.width, rectangle.height
 
             lib.cvRectangle(
