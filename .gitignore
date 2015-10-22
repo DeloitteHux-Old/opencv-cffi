@@ -1,2 +1,3 @@
 /opencv_cffi/_version.py
 /version.txt
+_opencv.c

@@ -16,6 +16,7 @@ ffi.set_source(
     """,
     libraries=[
         "opencv_highgui",
+        "opencv_objdetect",
         "opencv_videoio",
     ],
 )
@@ -28,6 +29,16 @@ ffi.cdef(
         r"\bCV_DEFAULT\([^)]+\)",
         "",
     """
+/****************************************************************************************\
+*                                   Dynamic Data structures                              *
+\****************************************************************************************/
+
+/******************************** Memory storage ****************************************/
+
+typedef struct CvMemBlock { ...; } CvMemBlock;
+typedef struct CvMemStorage { ...; } CvMemStorage;
+typedef struct CvMemStoragePos { ...; } CvMemStoragePos;
+
 /** @brief This is the "metatype" used *only* as a function parameter.
 
 It denotes that the function accepts arrays of multiple types, such as IplImage*, CvMat* or even
@@ -36,11 +47,17 @@ bytes of the header. In C++ interface the role of CvArr is played by InputArray 
  */
 typedef void CvArr;
 
+typedef struct CvSeq { ...; } CvSeq;
+
 typedef struct CvSize
 {
     int width;
     int height;
 } CvSize;
+
+/******************************* CvPoint and variants ***********************************/
+
+typedef struct CvPoint { ...; } CvPoint;
 
 /** constructs CvSize structure. */
 CvSize  cvSize( int width, int height );
@@ -280,6 +297,41 @@ CVAPI(const char*) cvGetWindowName( void* window_handle );
 CVAPI(int) cvWaitKey(int delay CV_DEFAULT(0));
 
 enum { CV_WINDOW_AUTOSIZE=... };
+
+
+/****************************************************************************************\
+*                         Haar-like Object Detection functions                           *
+\****************************************************************************************/
+
+
+typedef struct CvHaarClassifierCascade { ...;  } CvHaarClassifierCascade;
+
+/* Loads haar classifier cascade from a directory.
+   It is obsolete: convert your cascade to xml and use cvLoad instead */
+CVAPI(CvHaarClassifierCascade*) cvLoadHaarClassifierCascade(
+                    const char* directory, CvSize orig_window_size);
+
+CVAPI(void) cvReleaseHaarClassifierCascade( CvHaarClassifierCascade** cascade );
+
+#define CV_HAAR_DO_CANNY_PRUNING    1
+#define CV_HAAR_SCALE_IMAGE         2
+#define CV_HAAR_FIND_BIGGEST_OBJECT 4
+#define CV_HAAR_DO_ROUGH_SEARCH     8
+
+CVAPI(CvSeq*) cvHaarDetectObjects( const CvArr* image,
+                     CvHaarClassifierCascade* cascade, CvMemStorage* storage,
+                     double scale_factor CV_DEFAULT(1.1),
+                     int min_neighbors CV_DEFAULT(3), int flags CV_DEFAULT(0),
+                     CvSize min_size , CvSize max_size );
+
+/* sets images for haar classifier cascade */
+CVAPI(void) cvSetImagesForHaarClassifierCascade( CvHaarClassifierCascade* cascade,
+                                                const CvArr* sum, const CvArr* sqsum,
+                                                const CvArr* tilted_sum, double scale );
+
+/* runs the cascade on the specified window */
+CVAPI(int) cvRunHaarClassifierCascade( const CvHaarClassifierCascade* cascade,
+                                       CvPoint pt, int start_stage CV_DEFAULT(0));
     """,
         ),
     ),
