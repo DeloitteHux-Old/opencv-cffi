@@ -59,11 +59,15 @@ while escape_is_not_pressed():
     )
     for i in xrange(objects.total):
         rectangle = ffi.cast("CvRect*", lib.cvGetSeqElem(objects, i))
+        width, height = rectangle.width, rectangle.height
+
+        is_too_small_to_be_interesting = width * height < 10000
+        if is_too_small_to_be_interesting:
+            continue
 
         top_point = ffi.new("CvPoint *", [rectangle.x, rectangle.y])
         bottom_point = ffi.new(
-            "CvPoint *",
-            [rectangle.x + rectangle.width, rectangle.y + rectangle.height],
+            "CvPoint *", [rectangle.x + width, rectangle.y + height],
         )
 
         lib.cvRectangle(
