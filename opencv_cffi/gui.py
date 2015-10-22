@@ -6,6 +6,7 @@ from _opencv import lib
 @attributes(
     [
         Attribute(name="name"),
+        # TODO: Support sizing modes
     ],
 )
 class Window(object):
@@ -22,5 +23,3 @@ class Window(object):
 
     def show(self, image):
         lib.cvShowImage(self.name, image)
-
-# lib.cvNamedWindow("Example", lib.CV_WINDOW_AUTOSIZE)
