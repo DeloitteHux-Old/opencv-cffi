@@ -22,6 +22,9 @@ class Window(object):
         return self
 
     def __exit__(self, *args, **kwargs):
+        self.close()
+
+    def close(self):
         lib.cvDestroyWindow(self.name)
 
     def show(self, image):
