@@ -3,6 +3,9 @@ from characteristic import Attribute, attributes
 from _opencv import lib
 
 
+ESCAPE = ord("\x1b")
+
+
 @attributes(
     [
         Attribute(name="name"),
@@ -23,3 +26,7 @@ class Window(object):
 
     def show(self, image):
         lib.cvShowImage(self.name, image)
+
+
+def key_pressed(keycode=ESCAPE, milliseconds=1):
+    return lib.cvWaitKey(milliseconds) == keycode
