@@ -461,6 +461,8 @@ example, CV _ 8UC1 means the elements are 8-bit unsigned and the there is 1 chan
  */
 CVAPI(CvMat*)  cvCreateMat( int rows, int cols, int type );
 
+CvMat cvMat( int rows, int cols, int type, void* data );
+
 /** @brief Deallocates a matrix.
 
 The function decrements the matrix data reference counter and deallocates matrix header. If the data
@@ -1082,6 +1084,7 @@ elements are removed.
 @param arr Array to be cleared
  */
 CVAPI(void)  cvSetZero( CvArr* arr );
+void  cvmSet( CvMat* mat, int row, int col, double value );
 
 /** Splits a multi-channel array into the set of single-channel arrays or
    extracts particular [color] plane */
