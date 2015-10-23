@@ -16,11 +16,11 @@ def uglify(frame, facetangle):
     lib.cvSetImageROI(frame, facetangle.right_half._cv_rect)
     lib.cvNot(frame, frame)
     lib.cvResetImageROI(frame)
-    return frame
 
 
 def prettify(frame, facetangle):
     facetangle.draw_onto(frame)
+
     right_half = facetangle.right_half
     lib.cvSetImageROI(frame, right_half._cv_rect)
     prettified = lib.cvCreateImage(
@@ -43,7 +43,6 @@ def prettify(frame, facetangle):
     )
     lib.cvCopy(frame, prettified, ffi.NULL)
     lib.cvResetImageROI(frame)
-    return frame
 
 
 transform = uglify if sys.argv[2] == "uglify" else prettify
@@ -55,6 +54,6 @@ with Window(name="Example") as window:
             break
 
         for rectangle in classifier.detect_objects(inside=frame):
-            frame = transform(frame=frame, facetangle=rectangle)
+            transform(frame=frame, facetangle=rectangle)
 
         window.show(frame)
