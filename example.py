@@ -14,7 +14,7 @@ classifier = HaarClassifier.from_path(FilePath(sys.argv[1]))
 camera = Camera(index=0)
 
 
-def escape_is_pressed(milliseconds=20):
+def escape_is_pressed(milliseconds=1):
     return lib.cvWaitKey(milliseconds) == ESCAPE
 
 
