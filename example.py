@@ -27,7 +27,14 @@ def prettify(frame, facetangle):
         lib.cvGetSize(frame), frame.depth, frame.nChannels,
     )
     lib.cvFlip(frame, frame, 1)
-    lib.cvTransform(frame, frame, [-right_half.width, 0, 0, 0], ffi.NULL)
+    mat = lib.cvCreateMat(2, 3, 1)
+    lib.cvWarpAffine(
+        frame,
+        frame,
+        [1, 0, 0, 1, -right_half.width, 0],
+        lib.CV_INTER_LINEAR + lib.CV_WARP_FILL_OUTLIERS,
+        lib.cvScalarAll(0.0),
+    )
     lib.cvCopy(frame, prettified, ffi.NULL)
     lib.cvResetImageROI(frame)
     return frame
@@ -42,6 +49,6 @@ with Window(name="Example") as window:
             break
 
         for rectangle in classifier.detect_objects(inside=frame):
-            transformed = transform(frame=frame, facetangle=rectangle)
+            frame = transform(frame=frame, facetangle=rectangle)
 
-        window.show(transformed)
+        window.show(frame)

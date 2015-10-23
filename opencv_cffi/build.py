@@ -1309,6 +1309,15 @@ CVAPI(void)  cvBackProjectPCA( const CvArr* proj, const CvArr* mean,
 /** Calculates Mahalanobis(weighted) distance */
 CVAPI(double)  cvMahalanobis( const CvArr* vec1, const CvArr* vec2, const CvArr* mat );
 
+/** @brief Warps image with affine transform
+@note ::cvGetQuadrangleSubPix is similar to ::cvWarpAffine, but the outliers are extrapolated using
+replication border mode.
+@see cv::warpAffine
+*/
+CVAPI(void)  cvWarpAffine( const CvArr* src, CvArr* dst, const CvMat* map_matrix,
+                           int flags CV_DEFAULT(CV_INTER_LINEAR+CV_WARP_FILL_OUTLIERS),
+                           CvScalar fillval );
+
 /* "black box" capture structure */
 typedef struct CvCapture CvCapture;
 
@@ -1321,6 +1330,46 @@ CvCapture* cvCreateCameraCapture( int index );
 /* retrieve or set capture properties */
 double cvGetCaptureProperty( CvCapture* capture, int property_id );
 int    cvSetCaptureProperty( CvCapture* capture, int property_id, double value );
+
+/** Sub-pixel interpolation methods */
+enum
+{
+    CV_INTER_NN        =0,
+    CV_INTER_LINEAR    =1,
+    CV_INTER_CUBIC     =2,
+    CV_INTER_AREA      =3,
+    CV_INTER_LANCZOS4  =4
+};
+
+/** ... and other image warping flags */
+enum
+{
+    CV_WARP_FILL_OUTLIERS =8,
+    CV_WARP_INVERSE_MAP  =16
+};
+
+/** Shapes of a structuring element for morphological operations
+@see cv::MorphShapes, cv::getStructuringElement
+*/
+enum MorphShapes_c
+{
+    CV_SHAPE_RECT      =0,
+    CV_SHAPE_CROSS     =1,
+    CV_SHAPE_ELLIPSE   =2,
+    CV_SHAPE_CUSTOM    =100 //!< custom structuring element
+};
+
+/** Morphological operations */
+enum
+{
+    CV_MOP_ERODE        =0,
+    CV_MOP_DILATE       =1,
+    CV_MOP_OPEN         =2,
+    CV_MOP_CLOSE        =3,
+    CV_MOP_GRADIENT     =4,
+    CV_MOP_TOPHAT       =5,
+    CV_MOP_BLACKHAT     =6
+};
 
 enum
 {
