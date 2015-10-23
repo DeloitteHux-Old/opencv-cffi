@@ -1,3 +1,4 @@
+import itertools
 import sys
 
 from bp.filepath import FilePath
@@ -8,8 +9,8 @@ from opencv_cffi.gui import ESCAPE, Window, key_pressed
 from opencv_cffi.object_detection import HaarClassifier
 
 
-classifier = HaarClassifier.from_path(FilePath(sys.argv[1]))
-camera = Camera(index=0)
+cascade_filepath = FilePath(sys.argv[1])
+classifier = HaarClassifier.from_path(cascade_filepath, canny_pruning=True)
 
 
 def uglify(frame, facetangle):
@@ -51,8 +52,19 @@ def prettify(frame, facetangle):
 transform = uglify if sys.argv[2] == "uglify" else prettify
 
 
-with Window(name="Example") as window:
-    for frame in camera.frames():
+with Window(name="Front") as front_window, Window(name="Side") as side_window:
+
+    front = Camera(index=0)
+    side = Camera(index=1)
+
+
+    for window, frames in itertools.cycle(
+        [
+            (front_window, front.frames()),
+            (side_window, side.frames()),
+        ],
+    ):
+        frame = next(frames)
         if key_pressed(ESCAPE):
             break
 

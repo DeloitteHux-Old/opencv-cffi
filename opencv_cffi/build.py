@@ -1621,6 +1621,8 @@ CVAPI(void) cvSetImagesForHaarClassifierCascade( CvHaarClassifierCascade* cascad
 /* runs the cascade on the specified window */
 CVAPI(int) cvRunHaarClassifierCascade( const CvHaarClassifierCascade* cascade,
                                        CvPoint pt, int start_stage CV_DEFAULT(0));
+
+#define CV_HAAR_DO_CANNY_PRUNING ...
     """,
         ),
     ),
