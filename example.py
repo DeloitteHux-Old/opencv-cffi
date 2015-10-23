@@ -27,11 +27,17 @@ def prettify(frame, facetangle):
         lib.cvGetSize(frame), frame.depth, frame.nChannels,
     )
     lib.cvFlip(frame, frame, 1)
-    mat = lib.cvCreateMat(2, 3, 1)
+
+    shift_left = lib.cvCreateMat(2, 3, 1)
+    lib.cvZero(shift_left)
+    lib.cvmSet(mat, 0, 0, 1)
+    lib.cvmSet(mat, 1, 1, 1)
+    lib.cvmSet(mat, 0, 2, right_half.width)
+
     lib.cvWarpAffine(
         frame,
         frame,
-        [1, 0, 0, 1, -right_half.width, 0],
+        shift_left,
         lib.CV_INTER_LINEAR + lib.CV_WARP_FILL_OUTLIERS,
         lib.cvScalarAll(0.0),
     )
