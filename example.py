@@ -3,7 +3,7 @@ import sys
 from bp.filepath import FilePath
 
 from _opencv import lib
-from opencv_cffi.io import Camera
+from opencv_cffi.imaging import Camera
 from opencv_cffi.gui import Window
 from opencv_cffi.object_detection import HaarClassifier
 

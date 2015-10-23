@@ -54,6 +54,41 @@ bytes of the header. In C++ interface the role of CvArr is played by InputArray 
  */
 typedef void CvArr;
 
+/****************************************************************************************\
+*                                  Matrix type (CvMat)                                   *
+\****************************************************************************************/
+
+/*
+@deprecated CvMat is now obsolete; consider using Mat instead.
+ */
+typedef struct CvMat { ...; } CvMat;
+
+/** @brief Returns matrix header for arbitrary array.
+
+The function returns a matrix header for the input array that can be a matrix - CvMat, an image -
+IplImage, or a multi-dimensional dense array - CvMatND (the third option is allowed only if
+allowND != 0) . In the case of matrix the function simply returns the input pointer. In the case of
+IplImage\* or CvMatND it initializes the header structure with parameters of the current image ROI
+and returns &header. Because COI is not supported by CvMat, it is returned separately.
+
+The function provides an easy way to handle both types of arrays - IplImage and CvMat using the same
+code. Input array must have non-zero data pointer, otherwise the function will report an error.
+
+@note If the input array is IplImage with planar data layout and COI set, the function returns the
+pointer to the selected plane and COI == 0. This feature allows user to process IplImage structures
+with planar data layout, even though OpenCV does not support such images.
+@param arr Input array
+@param header Pointer to CvMat structure used as a temporary buffer
+@param coi Optional output parameter for storing COI
+@param allowND If non-zero, the function accepts multi-dimensional dense arrays (CvMatND\*) and
+returns 2D matrix (if CvMatND has two dimensions) or 1D matrix (when CvMatND has 1 dimension or
+more than 2 dimensions). The CvMatND array must be continuous.
+@sa cvGetImage, cvarrToMat.
+ */
+CVAPI(CvMat*) cvGetMat( const CvArr* arr, CvMat* header,
+                       int* coi CV_DEFAULT(NULL),
+                       int allowND CV_DEFAULT(0));
+
 /*********************************** Sequence *******************************************/
 
 typedef struct CvSeqBlock
@@ -152,6 +187,114 @@ CVAPI(void)  cvRectangle( CvArr* img, CvPoint pt1, CvPoint pt2,
                           CvScalar color, int thickness CV_DEFAULT(1),
                           int line_type CV_DEFAULT(8),
                           int shift CV_DEFAULT(0));
+
+/****************************************************************************************\
+*                                Matrix operations                                       *
+\****************************************************************************************/
+
+/** @brief Calculates the cross product of two 3D vectors.
+
+The function calculates the cross product of two 3D vectors:
+\f[\texttt{dst} =  \texttt{src1} \times \texttt{src2}\f]
+or:
+\f[\begin{array}{l} \texttt{dst} _1 =  \texttt{src1} _2  \texttt{src2} _3 -  \texttt{src1} _3  \texttt{src2} _2 \\ \texttt{dst} _2 =  \texttt{src1} _3  \texttt{src2} _1 -  \texttt{src1} _1  \texttt{src2} _3 \\ \texttt{dst} _3 =  \texttt{src1} _1  \texttt{src2} _2 -  \texttt{src1} _2  \texttt{src2} _1 \end{array}\f]
+@param src1 The first source vector
+@param src2 The second source vector
+@param dst The destination vector
+ */
+CVAPI(void)  cvCrossProduct( const CvArr* src1, const CvArr* src2, CvArr* dst );
+
+/** Extended matrix transform:
+   dst = alpha*op(A)*op(B) + beta*op(C), where op(X) is X or X^T */
+CVAPI(void)  cvGEMM( const CvArr* src1, const CvArr* src2, double alpha,
+                     const CvArr* src3, double beta, CvArr* dst,
+                     int tABC CV_DEFAULT(0));
+
+/** Transforms each element of source array and stores
+   resultant vectors in destination array */
+CVAPI(void)  cvTransform( const CvArr* src, CvArr* dst,
+                          const CvMat* transmat,
+                          const CvMat* shiftvec CV_DEFAULT(NULL));
+
+/** Does perspective transform on every element of input array */
+CVAPI(void)  cvPerspectiveTransform( const CvArr* src, CvArr* dst,
+                                     const CvMat* mat );
+
+/** Calculates (A-delta)*(A-delta)^T (order=0) or (A-delta)^T*(A-delta) (order=1) */
+CVAPI(void) cvMulTransposed( const CvArr* src, CvArr* dst, int order,
+                             const CvArr* delta CV_DEFAULT(NULL),
+                             double scale CV_DEFAULT(1.) );
+
+/** Tranposes matrix. Square matrices can be transposed in-place */
+CVAPI(void)  cvTranspose( const CvArr* src, CvArr* dst );
+
+/** Completes the symmetric matrix from the lower (LtoR=0) or from the upper (LtoR!=0) part */
+CVAPI(void)  cvCompleteSymm( CvMat* matrix, int LtoR CV_DEFAULT(0) );
+
+/** Mirror array data around horizontal (flip=0),
+   vertical (flip=1) or both(flip=-1) axises:
+   cvFlip(src) flips images vertically and sequences horizontally (inplace) */
+CVAPI(void)  cvFlip( const CvArr* src, CvArr* dst CV_DEFAULT(NULL),
+                     int flip_mode CV_DEFAULT(0));
+
+/** Performs Singular Value Decomposition of a matrix */
+CVAPI(void)   cvSVD( CvArr* A, CvArr* W, CvArr* U CV_DEFAULT(NULL),
+                     CvArr* V CV_DEFAULT(NULL), int flags CV_DEFAULT(0));
+
+/** Performs Singular Value Back Substitution (solves A*X = B):
+   flags must be the same as in cvSVD */
+CVAPI(void)   cvSVBkSb( const CvArr* W, const CvArr* U,
+                        const CvArr* V, const CvArr* B,
+                        CvArr* X, int flags );
+
+/** Inverts matrix */
+CVAPI(double)  cvInvert( const CvArr* src, CvArr* dst,
+                         int method CV_DEFAULT(CV_LU));
+
+/** Solves linear system (src1)*(dst) = (src2)
+   (returns 0 if src1 is a singular and CV_LU method is used) */
+CVAPI(int)  cvSolve( const CvArr* src1, const CvArr* src2, CvArr* dst,
+                     int method CV_DEFAULT(CV_LU));
+
+/** Calculates determinant of input matrix */
+CVAPI(double) cvDet( const CvArr* mat );
+
+/** Calculates trace of the matrix (sum of elements on the main diagonal) */
+CVAPI(CvScalar) cvTrace( const CvArr* mat );
+
+/** Finds eigen values and vectors of a symmetric matrix */
+CVAPI(void)  cvEigenVV( CvArr* mat, CvArr* evects, CvArr* evals,
+                        double eps CV_DEFAULT(0),
+                        int lowindex CV_DEFAULT(-1),
+                        int highindex CV_DEFAULT(-1));
+
+///* Finds selected eigen values and vectors of a symmetric matrix */
+//CVAPI(void)  cvSelectedEigenVV( CvArr* mat, CvArr* evects, CvArr* evals,
+//                                int lowindex, int highindex );
+
+/** Makes an identity matrix (mat_ij = i == j) */
+CVAPI(void)  cvSetIdentity( CvArr* mat, CvScalar value );
+
+/** Fills matrix with given range of numbers */
+CVAPI(CvArr*)  cvRange( CvArr* mat, double start, double end );
+
+/** Calculates covariation matrix for a set of vectors
+@see @ref core_c_CovarFlags "flags"
+*/
+CVAPI(void)  cvCalcCovarMatrix( const CvArr** vects, int count,
+                                CvArr* cov_mat, CvArr* avg, int flags );
+
+CVAPI(void)  cvCalcPCA( const CvArr* data, CvArr* mean,
+                        CvArr* eigenvals, CvArr* eigenvects, int flags );
+
+CVAPI(void)  cvProjectPCA( const CvArr* data, const CvArr* mean,
+                           const CvArr* eigenvects, CvArr* result );
+
+CVAPI(void)  cvBackProjectPCA( const CvArr* proj, const CvArr* mean,
+                               const CvArr* eigenvects, CvArr* result );
+
+/** Calculates Mahalanobis(weighted) distance */
+CVAPI(double)  cvMahalanobis( const CvArr* vec1, const CvArr* vec2, const CvArr* mat );
 
 /* "black box" capture structure */
 typedef struct CvCapture CvCapture;

@@ -20,4 +20,8 @@ class Camera(object):
         capture = lib.cvCreateCameraCapture(self.index)
         next_frame = partial(lib.cvQueryFrame, capture)
         for frame in iter(next_frame, None):
-            yield frame
+            from _opencv import ffi
+            mat = lib.cvGetMat(frame)
+            print frame
+            lib.cvFlip(frame, mat, 1)
+            yield mat
