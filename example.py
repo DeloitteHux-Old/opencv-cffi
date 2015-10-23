@@ -26,22 +26,25 @@ def prettify(frame, facetangle):
     prettified = lib.cvCreateImage(
         lib.cvGetSize(frame), frame.depth, frame.nChannels,
     )
-    lib.cvFlip(frame, frame, 1)
 
-    shift_left = lib.cvCreateMat(2, 3, 1)
-    lib.cvZero(shift_left)
-    lib.cvmSet(mat, 0, 0, 1)
-    lib.cvmSet(mat, 1, 1, 1)
-    lib.cvmSet(mat, 0, 2, right_half.width)
+    lib.cvCopy(frame, prettified, ffi.NULL)
+    lib.cvFlip(prettified, prettified, 1)
+
+    shift_left = lib.cvCreateMat(2, 3, 6)
+    lib.cvSetZero(shift_left)
+    lib.cvmSet(shift_left, 0, 0, 1)
+    lib.cvmSet(shift_left, 1, 1, 1)
+    lib.cvmSet(shift_left, 0, 2, right_half.width)
 
     lib.cvWarpAffine(
-        frame,
-        frame,
+        prettified,
+        prettified,
         shift_left,
         lib.CV_INTER_LINEAR + lib.CV_WARP_FILL_OUTLIERS,
         lib.cvScalarAll(0.0),
     )
-    lib.cvCopy(frame, prettified, ffi.NULL)
+
+    lib.cvCopy(prettified, frame, ffi.NULL)
     lib.cvResetImageROI(frame)
 
 
