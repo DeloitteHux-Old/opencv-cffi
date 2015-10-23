@@ -63,3 +63,14 @@ class Rectangle(object):
     @property
     def y(self):
         return self._cv_rect.y
+
+    @property
+    def right_half(self):
+        new_width = self.width // 2
+        cv_rect = lib.cvRect(
+            self.x + new_width,
+            self.y,
+            new_width,
+            self.height,
+        )
+        return self.__class__(cv_rect=cv_rect)

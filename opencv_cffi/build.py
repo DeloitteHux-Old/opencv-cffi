@@ -31,20 +31,15 @@ ffi.cdef(
     """
 typedef signed char schar;
 
-/****************************************************************************************\
-*                                   Dynamic Data structures                              *
-\****************************************************************************************/
-
-/******************************** Memory storage ****************************************/
-
 typedef struct CvMemBlock { ...; } CvMemBlock;
 typedef struct CvMemStorage { ...; } CvMemStorage;
 typedef struct CvMemStoragePos { ...; } CvMemStoragePos;
 
-/** Creates new memory storage.
-   block_size == 0 means that default,
-   somewhat optimal size, is used (currently, it is 64K) */
-CVAPI(CvMemStorage*)  cvCreateMemStorage( int block_size CV_DEFAULT(0));
+typedef struct CvSize
+{
+    int width;
+    int height;
+} CvSize;
 
 /** @brief This is the "metatype" used *only* as a function parameter.
 
@@ -54,14 +49,332 @@ bytes of the header. In C++ interface the role of CvArr is played by InputArray 
  */
 typedef void CvArr;
 
-/****************************************************************************************\
-*                                  Matrix type (CvMat)                                   *
-\****************************************************************************************/
+typedef struct _IplImage IplImage;
+typedef struct _IplTileInfo IplTileInfo;
+typedef struct _IplROI IplROI;
+
+typedef struct CvSeqBlock
+{
+    struct CvSeqBlock*  prev; /**< Previous sequence block.                   */
+    struct CvSeqBlock*  next; /**< Next sequence block.                       */
+  int    start_index;         /**< Index of the first element in the block +  */
+                              /**< sequence->first->start_index.              */
+    int    count;             /**< Number of elements in the block.           */
+    schar* data;              /**< Pointer to the first element of the block. */
+}
+CvSeqBlock;
+
+typedef struct CvSeq {
+    int       total;          /**< Total number of elements.            */  \
+    int       elem_size;      /**< Size of sequence element in bytes.   */  \
+    schar*    block_max;      /**< Maximal bound of the last block.     */  \
+    schar*    ptr;            /**< Current write pointer.               */  \
+    int       delta_elems;    /**< Grow seq this many at a time.        */  \
+    CvMemStorage* storage;    /**< Where the seq is stored.             */  \
+    CvSeqBlock* free_blocks;  /**< Free blocks list.                    */  \
+    CvSeqBlock* first;        /**< Pointer to the first sequence block. */
+    ...;
+} CvSeq;
 
 /*
 @deprecated CvMat is now obsolete; consider using Mat instead.
  */
 typedef struct CvMat { ...; } CvMat;
+
+/** @sa Scalar_
+ */
+typedef struct CvScalar { double val[4]; } CvScalar;
+
+/*************************************** CvRect *****************************************/
+/** @sa Rect_ */
+typedef struct CvRect
+{
+    int x;
+    int y;
+    int width;
+    int height;
+
+}
+CvRect;
+
+/******************************* CvPoint and variants ***********************************/
+
+typedef struct CvPoint {
+    int x;
+    int y;
+} CvPoint;
+
+/****************************************************************************************\
+*                   Arithmetic, logic and comparison operations                          *
+\****************************************************************************************/
+
+/** dst(mask) = src1(mask) + src2(mask) */
+CVAPI(void)  cvAdd( const CvArr* src1, const CvArr* src2, CvArr* dst,
+                    const CvArr* mask CV_DEFAULT(NULL));
+
+/** dst(mask) = src(mask) + value */
+CVAPI(void)  cvAddS( const CvArr* src, CvScalar value, CvArr* dst,
+                     const CvArr* mask CV_DEFAULT(NULL));
+
+/** dst(mask) = src1(mask) - src2(mask) */
+CVAPI(void)  cvSub( const CvArr* src1, const CvArr* src2, CvArr* dst,
+                    const CvArr* mask CV_DEFAULT(NULL));
+
+/** dst(mask) = src(mask) - value = src(mask) + (-value) */
+void  cvSubS( const CvArr* src, CvScalar value, CvArr* dst,
+                         const CvArr* mask CV_DEFAULT(NULL));
+
+/** dst(mask) = value - src(mask) */
+CVAPI(void)  cvSubRS( const CvArr* src, CvScalar value, CvArr* dst,
+                      const CvArr* mask CV_DEFAULT(NULL));
+
+/** dst(idx) = src1(idx) * src2(idx) * scale
+   (scaled element-wise multiplication of 2 arrays) */
+CVAPI(void)  cvMul( const CvArr* src1, const CvArr* src2,
+                    CvArr* dst, double scale CV_DEFAULT(1) );
+
+/** element-wise division/inversion with scaling:
+    dst(idx) = src1(idx) * scale / src2(idx)
+    or dst(idx) = scale / src2(idx) if src1 == 0 */
+CVAPI(void)  cvDiv( const CvArr* src1, const CvArr* src2,
+                    CvArr* dst, double scale CV_DEFAULT(1));
+
+/** dst = src1 * scale + src2 */
+CVAPI(void)  cvScaleAdd( const CvArr* src1, CvScalar scale,
+                         const CvArr* src2, CvArr* dst );
+
+/** dst = src1 * alpha + src2 * beta + gamma */
+CVAPI(void)  cvAddWeighted( const CvArr* src1, double alpha,
+                            const CvArr* src2, double beta,
+                            double gamma, CvArr* dst );
+
+/** @brief Calculates the dot product of two arrays in Euclidean metrics.
+
+The function calculates and returns the Euclidean dot product of two arrays.
+
+\f[src1  \bullet src2 =  \sum _I ( \texttt{src1} (I)  \texttt{src2} (I))\f]
+
+In the case of multiple channel arrays, the results for all channels are accumulated. In particular,
+cvDotProduct(a,a) where a is a complex vector, will return \f$||\texttt{a}||^2\f$. The function can
+process multi-dimensional arrays, row by row, layer by layer, and so on.
+@param src1 The first source array
+@param src2 The second source array
+ */
+CVAPI(double)  cvDotProduct( const CvArr* src1, const CvArr* src2 );
+
+/** dst(idx) = src1(idx) & src2(idx) */
+CVAPI(void) cvAnd( const CvArr* src1, const CvArr* src2,
+                  CvArr* dst, const CvArr* mask CV_DEFAULT(NULL));
+
+/** dst(idx) = src(idx) & value */
+CVAPI(void) cvAndS( const CvArr* src, CvScalar value,
+                   CvArr* dst, const CvArr* mask CV_DEFAULT(NULL));
+
+/** dst(idx) = src1(idx) | src2(idx) */
+CVAPI(void) cvOr( const CvArr* src1, const CvArr* src2,
+                 CvArr* dst, const CvArr* mask CV_DEFAULT(NULL));
+
+/** dst(idx) = src(idx) | value */
+CVAPI(void) cvOrS( const CvArr* src, CvScalar value,
+                  CvArr* dst, const CvArr* mask CV_DEFAULT(NULL));
+
+/** dst(idx) = src1(idx) ^ src2(idx) */
+CVAPI(void) cvXor( const CvArr* src1, const CvArr* src2,
+                  CvArr* dst, const CvArr* mask CV_DEFAULT(NULL));
+
+/** dst(idx) = src(idx) ^ value */
+CVAPI(void) cvXorS( const CvArr* src, CvScalar value,
+                   CvArr* dst, const CvArr* mask CV_DEFAULT(NULL));
+
+/** dst(idx) = ~src(idx) */
+CVAPI(void) cvNot( const CvArr* src, CvArr* dst );
+
+/** dst(idx) = lower(idx) <= src(idx) < upper(idx) */
+CVAPI(void) cvInRange( const CvArr* src, const CvArr* lower,
+                      const CvArr* upper, CvArr* dst );
+
+/** dst(idx) = lower <= src(idx) < upper */
+CVAPI(void) cvInRangeS( const CvArr* src, CvScalar lower,
+                       CvScalar upper, CvArr* dst );
+
+/** The comparison operation support single-channel arrays only.
+   Destination image should be 8uC1 or 8sC1 */
+
+/** dst(idx) = src1(idx) _cmp_op_ src2(idx) */
+CVAPI(void) cvCmp( const CvArr* src1, const CvArr* src2, CvArr* dst, int cmp_op );
+
+/** dst(idx) = src1(idx) _cmp_op_ value */
+CVAPI(void) cvCmpS( const CvArr* src, double value, CvArr* dst, int cmp_op );
+
+/** dst(idx) = min(src1(idx),src2(idx)) */
+CVAPI(void) cvMin( const CvArr* src1, const CvArr* src2, CvArr* dst );
+
+/** dst(idx) = max(src1(idx),src2(idx)) */
+CVAPI(void) cvMax( const CvArr* src1, const CvArr* src2, CvArr* dst );
+
+/** dst(idx) = min(src(idx),value) */
+CVAPI(void) cvMinS( const CvArr* src, double value, CvArr* dst );
+
+/** dst(idx) = max(src(idx),value) */
+CVAPI(void) cvMaxS( const CvArr* src, double value, CvArr* dst );
+
+/** dst(x,y,c) = abs(src1(x,y,c) - src2(x,y,c)) */
+CVAPI(void) cvAbsDiff( const CvArr* src1, const CvArr* src2, CvArr* dst );
+
+/** dst(x,y,c) = abs(src(x,y,c) - value(c)) */
+CVAPI(void) cvAbsDiffS( const CvArr* src, CvArr* dst, CvScalar value );
+
+/****************************************************************************************\
+*          Array allocation, deallocation, initialization and access to elements         *
+\****************************************************************************************/
+
+/** `malloc` wrapper.
+   If there is no enough memory, the function
+   (as well as other OpenCV functions that call cvAlloc)
+   raises an error. */
+CVAPI(void*)  cvAlloc( size_t size );
+
+/** `free` wrapper.
+   Here and further all the memory releasing functions
+   (that all call cvFree) take double pointer in order to
+   to clear pointer to the data after releasing it.
+   Passing pointer to NULL pointer is Ok: nothing happens in this case
+*/
+CVAPI(void)   cvFree_( void* ptr );
+
+/** @brief Creates an image header but does not allocate the image data.
+
+@param size Image width and height
+@param depth Image depth (see cvCreateImage )
+@param channels Number of channels (see cvCreateImage )
+ */
+CVAPI(IplImage*)  cvCreateImageHeader( CvSize size, int depth, int channels );
+
+/** @brief Initializes an image header that was previously allocated.
+
+The returned IplImage\* points to the initialized header.
+@param image Image header to initialize
+@param size Image width and height
+@param depth Image depth (see cvCreateImage )
+@param channels Number of channels (see cvCreateImage )
+@param origin Top-left IPL_ORIGIN_TL or bottom-left IPL_ORIGIN_BL
+@param align Alignment for image rows, typically 4 or 8 bytes
+ */
+CVAPI(IplImage*) cvInitImageHeader( IplImage* image, CvSize size, int depth,
+                                   int channels, int origin CV_DEFAULT(0),
+                                   int align CV_DEFAULT(4));
+
+/** @brief Creates an image header and allocates the image data.
+
+This function call is equivalent to the following code:
+@code
+    header = cvCreateImageHeader(size, depth, channels);
+    cvCreateData(header);
+@endcode
+@param size Image width and height
+@param depth Bit depth of image elements. See IplImage for valid depths.
+@param channels Number of channels per pixel. See IplImage for details. This function only creates
+images with interleaved channels.
+ */
+CVAPI(IplImage*)  cvCreateImage( CvSize size, int depth, int channels );
+
+/** @brief Deallocates an image header.
+
+This call is an analogue of :
+@code
+    if(image )
+    {
+        iplDeallocate(*image, IPL_IMAGE_HEADER | IPL_IMAGE_ROI);
+        *image = 0;
+    }
+@endcode
+but it does not use IPL functions by default (see the CV_TURN_ON_IPL_COMPATIBILITY macro).
+@param image Double pointer to the image header
+ */
+CVAPI(void)  cvReleaseImageHeader( IplImage** image );
+
+/** @brief Deallocates the image header and the image data.
+
+This call is a shortened form of :
+@code
+    if(*image )
+    {
+        cvReleaseData(*image);
+        cvReleaseImageHeader(image);
+    }
+@endcode
+@param image Double pointer to the image header
+*/
+CVAPI(void)  cvReleaseImage( IplImage** image );
+
+/** Creates a copy of IPL image (widthStep may differ) */
+CVAPI(IplImage*) cvCloneImage( const IplImage* image );
+
+/** @brief Sets the channel of interest in an IplImage.
+
+If the ROI is set to NULL and the coi is *not* 0, the ROI is allocated. Most OpenCV functions do
+*not* support the COI setting, so to process an individual image/matrix channel one may copy (via
+cvCopy or cvSplit) the channel to a separate image/matrix, process it and then copy the result
+back (via cvCopy or cvMerge) if needed.
+@param image A pointer to the image header
+@param coi The channel of interest. 0 - all channels are selected, 1 - first channel is selected,
+etc. Note that the channel indices become 1-based.
+ */
+CVAPI(void)  cvSetImageCOI( IplImage* image, int coi );
+
+/** @brief Returns the index of the channel of interest.
+
+Returns the channel of interest of in an IplImage. Returned values correspond to the coi in
+cvSetImageCOI.
+@param image A pointer to the image header
+ */
+CVAPI(int)  cvGetImageCOI( const IplImage* image );
+
+/** @brief Sets an image Region Of Interest (ROI) for a given rectangle.
+
+If the original image ROI was NULL and the rect is not the whole image, the ROI structure is
+allocated.
+
+Most OpenCV functions support the use of ROI and treat the image rectangle as a separate image. For
+example, all of the pixel coordinates are counted from the top-left (or bottom-left) corner of the
+ROI, not the original image.
+@param image A pointer to the image header
+@param rect The ROI rectangle
+ */
+CVAPI(void)  cvSetImageROI( IplImage* image, CvRect rect );
+
+/** @brief Resets the image ROI to include the entire image and releases the ROI structure.
+
+This produces a similar result to the following, but in addition it releases the ROI structure. :
+@code
+    cvSetImageROI(image, cvRect(0, 0, image->width, image->height ));
+    cvSetImageCOI(image, 0);
+@endcode
+@param image A pointer to the image header
+ */
+CVAPI(void)  cvResetImageROI( IplImage* image );
+
+/** @brief Returns the image ROI.
+
+If there is no ROI set, cvRect(0,0,image-\>width,image-\>height) is returned.
+@param image A pointer to the image header
+ */
+CVAPI(CvRect) cvGetImageROI( const IplImage* image );
+
+/****************************************************************************************\
+*                                   Dynamic Data structures                              *
+\****************************************************************************************/
+
+/******************************** Memory storage ****************************************/
+
+/** Creates new memory storage.
+   block_size == 0 means that default,
+   somewhat optimal size, is used (currently, it is 64K) */
+CVAPI(CvMemStorage*)  cvCreateMemStorage( int block_size CV_DEFAULT(0));
+
+/****************************************************************************************\
+*                                  Matrix type (CvMat)                                   *
+\****************************************************************************************/
 
 /** @brief Returns matrix header for arbitrary array.
 
@@ -91,45 +404,12 @@ CVAPI(CvMat*) cvGetMat( const CvArr* arr, CvMat* header,
 
 /*********************************** Sequence *******************************************/
 
-typedef struct CvSeqBlock
-{
-    struct CvSeqBlock*  prev; /**< Previous sequence block.                   */
-    struct CvSeqBlock*  next; /**< Next sequence block.                       */
-  int    start_index;         /**< Index of the first element in the block +  */
-                              /**< sequence->first->start_index.              */
-    int    count;             /**< Number of elements in the block.           */
-    schar* data;              /**< Pointer to the first element of the block. */
-}
-CvSeqBlock;
-
-typedef struct CvSeq {
-    int       total;          /**< Total number of elements.            */  \
-    int       elem_size;      /**< Size of sequence element in bytes.   */  \
-    schar*    block_max;      /**< Maximal bound of the last block.     */  \
-    schar*    ptr;            /**< Current write pointer.               */  \
-    int       delta_elems;    /**< Grow seq this many at a time.        */  \
-    CvMemStorage* storage;    /**< Where the seq is stored.             */  \
-    CvSeqBlock* free_blocks;  /**< Free blocks list.                    */  \
-    CvSeqBlock* first;        /**< Pointer to the first sequence block. */
-    ...;
-} CvSeq;
-
 /** Retrieves pointer to specified sequence element.
    Negative indices are supported and mean counting from the end
    (e.g -1 means the last sequence element) */
 CVAPI(schar*)  cvGetSeqElem( const CvSeq* seq, int index );
 
-typedef struct CvSize
-{
-    int width;
-    int height;
-} CvSize;
-
 /************************************* CvScalar *****************************************/
-/** @sa Scalar_
- */
-typedef struct CvScalar { double val[4]; } CvScalar;
-
 CvScalar  cvScalar( double val0, double val1 CV_DEFAULT(0),
                                double val2 CV_DEFAULT(0), double val3 CV_DEFAULT(0));
 CvScalar  cvRealScalar( double val0 );
@@ -156,27 +436,11 @@ CVAPI(void*) cvLoad( const char* filename,
                      const char* name CV_DEFAULT(NULL),
                      const char** real_name CV_DEFAULT(NULL) );
 
-/*************************************** CvRect *****************************************/
-/** @sa Rect_ */
-typedef struct CvRect
-{
-    int x;
-    int y;
-    int width;
-    int height;
-
-}
-CvRect;
-
-/******************************* CvPoint and variants ***********************************/
-
-typedef struct CvPoint {
-    int x;
-    int y;
-} CvPoint;
-
 /** constructs CvSize structure. */
 CvSize  cvSize( int width, int height );
+
+/** constructs CvRect structure. */
+CvRect  cvRect( int x, int y, int width, int height );
 
 /** @brief Draws a rectangle given two opposite corners of the rectangle (pt1 & pt2)
 
@@ -469,11 +733,6 @@ enum
     CV_CAP_INTELPERC_IMAGE_GENERATOR =...,
     CV_CAP_INTELPERC_GENERATORS_MASK =...
 };
-
-typedef struct _IplImage IplImage;
-typedef struct _IplTileInfo IplTileInfo;
-typedef struct _IplROI IplROI;
-
 
 typedef IplImage* (* Cv_iplCreateImageHeader)
                             (int,int,int,char*,char*,int,int,int,int,int,
