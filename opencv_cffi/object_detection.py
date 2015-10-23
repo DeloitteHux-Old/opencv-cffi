@@ -13,7 +13,7 @@ class HaarClassifier(object):
     def __init__(self):
         storage = lib.cvCreateMemStorage(0)
         assert storage is not None
-        self.storage = storage
+        self._storage = storage
 
     @classmethod
     def from_path(cls, path, **kwargs):
