@@ -26,7 +26,7 @@ class HaarClassifier(object):
             1.1,
             4,
             0,
-            lib.cvSize(50, 50),
+            lib.cvSize(100, 100),
             lib.cvSize(0, 0),
         )
 
