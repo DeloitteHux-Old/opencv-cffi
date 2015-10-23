@@ -1,7 +1,7 @@
 from characteristic import Attribute, attributes
 
 from _opencv import lib
-from opencv_cffi.utils import _OpenCVSequence
+from opencv_cffi._types import Rectangle, Sequence
 
 
 @attributes(
@@ -19,7 +19,7 @@ class HaarClassifier(object):
         return cls(cascade=cascade, **kwargs)
 
     def detect_objects(self, inside):
-        raw_objects = lib.cvHaarDetectObjects(
+        objects = lib.cvHaarDetectObjects(
             inside,
             self.cascade,
             lib.cvCreateMemStorage(0),
@@ -30,4 +30,4 @@ class HaarClassifier(object):
             lib.cvSize(0, 0),
         )
 
-        return _OpenCVSequence(cv_seq=raw_objects, contents_type="CvRect *")
+        return Sequence(cv_seq=objects, type=Rectangle)

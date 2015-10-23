@@ -29,16 +29,6 @@ with Window(name="Example") as window:
             break
 
         for rectangle in classifier.detect_objects(inside=frame):
-            width, height = rectangle.width, rectangle.height
-
-            lib.cvRectangle(
-                frame,
-                [rectangle.x, rectangle.y],
-                [rectangle.x + width, rectangle.y + height],
-                lib.cvScalar(255, 0, 0, 0),
-                1,
-                8,
-                0,
-            )
+            rectangle.draw_onto(frame)
 
         window.show(frame)
