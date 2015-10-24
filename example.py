@@ -62,7 +62,7 @@ with Window(name="Front") as front_window:
         ],
     ):
         frame = next(frames)
-        if key_pressed(ESCAPE):
+        if key_pressed() == ESCAPE:
             break
 
         for rectangle in classifier.detect_objects(inside=frame):

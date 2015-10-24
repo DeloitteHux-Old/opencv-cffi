@@ -31,5 +31,5 @@ class Window(object):
         lib.cvShowImage(self.name, image)
 
 
-def key_pressed(keycode=ESCAPE, milliseconds=1):
-    return lib.cvWaitKey(milliseconds) == keycode
+def key_pressed(milliseconds=1):
+    return lib.cvWaitKey(milliseconds)
