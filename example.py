@@ -52,16 +52,13 @@ def prettify(frame, facetangle):
 transform = uglify if sys.argv[2] == "uglify" else prettify
 
 
-with Window(name="Front") as front_window, Window(name="Side") as side_window:
+with Window(name="Front") as front_window:
 
     front = Camera(index=0)
-    side = Camera(index=1)
-
 
     for window, frames in itertools.cycle(
         [
             (front_window, front.frames()),
-            (side_window, side.frames()),
         ],
     ):
         frame = next(frames)
