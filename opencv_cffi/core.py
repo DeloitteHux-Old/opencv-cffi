@@ -1,6 +1,29 @@
+from contextlib import contextmanager
+
 from characteristic import Attribute, attributes
 
 from _opencv import lib
+
+
+@attributes(
+    [
+        Attribute(name="_ipl_image")
+    ],
+)
+class Image(object):
+    @property
+    def depth(self):
+        return self._ipl_image.depth
+
+    @property
+    def channels(self):
+        return self._ipl_image.nChannels
+
+    @contextmanager
+    def region_of_interest(self, rectangle):
+        lib.cvSetImageROI(self._ipl_image, rectangle._cv_rect)
+        yield rectangle
+        lib.cvResetImageROI(self._ipl_image)
 
 
 @attributes(
@@ -35,3 +58,9 @@ class Matrix(object):
 
     def __setitem__(self, (row, column), element):
         lib.cvmSet(self._cv_mat, row, column, element)
+
+
+def invert(image, into=None):
+    if into is None:
+        into = image
+    lib.cvNot(image._ipl_image, into._ipl_image)

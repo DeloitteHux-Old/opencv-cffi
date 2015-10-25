@@ -31,7 +31,7 @@ class Rectangle(object):
 
     def draw_onto(self, frame):
         lib.cvRectangle(
-            frame,
+            frame._ipl_image,
             self.top_left,
             self.bottom_right,
             lib.cvScalar(255, 0, 0, 0),

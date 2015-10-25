@@ -28,7 +28,7 @@ class Window(object):
         lib.cvDestroyWindow(self.name)
 
     def show(self, image):
-        lib.cvShowImage(self.name, image)
+        lib.cvShowImage(self.name, image._ipl_image)
 
 
 def key_pressed(milliseconds=1):

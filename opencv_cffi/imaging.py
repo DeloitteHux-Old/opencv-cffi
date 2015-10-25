@@ -3,6 +3,7 @@ from functools import partial
 from characteristic import Attribute, attributes
 
 from _opencv import ffi, lib
+from opencv_cffi.core import Image
 
 
 class InitializationError(Exception):
@@ -26,4 +27,4 @@ class Camera(object):
             raise InitializationError(self)
         next_frame = partial(lib.cvQueryFrame, capture)
         for frame in iter(next_frame, None):
-            yield frame
+            yield Image(ipl_image=frame)
