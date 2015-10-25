@@ -75,6 +75,18 @@ class Matrix(object):
         return cls(cv_mat=lib.cvCreateMat(rows, columns, 6), **kwargs)
 
     @classmethod
+    def translation(cls, x=0, y=0, **kwargs):
+        """
+        Return an (affine) translation matrix of the given x and y amounts.
+
+        """
+
+        return cls.from_data(
+            [1, 0, x],
+            [0, 1, y],
+        )
+
+    @classmethod
     def zeros(cls, **kwargs):
         matrix = cls.of_dimensions(**kwargs)
         lib.cvSetZero(matrix)
