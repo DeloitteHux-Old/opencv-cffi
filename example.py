@@ -20,13 +20,11 @@ def uglify(frame, facetangle):
 
 
 def prettify(frame, facetangle):
-    facetangle.draw_onto(frame)
-
     with frame.region_of_interest(facetangle.right_half) as right_half:
         prettified = frame.flipped_vertical()
 
     with frame.region_of_interest(facetangle.left_half):
-        copy(array=prettified._ipl_image, into=frame._ipl_image)
+        prettified.write_into(frame)
 
 
 transform = uglify if sys.argv[2] == "uglify" else prettify

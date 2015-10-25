@@ -34,6 +34,9 @@ class Image(object):
         copy(self._ipl_image, copied)
         return self.__class__(ipl_image=copied)
 
+    def write_into(self, image):
+        copy(array=self._ipl_image, into=image._ipl_image)
+
     def flipped_horizontal(self):
         copied = self.copy()
         flip_horizontal(copied._ipl_image)
