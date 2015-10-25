@@ -34,6 +34,21 @@ class Image(object):
         lib.cvCopy(self._ipl_image, copied, ffi.NULL)
         return self.__class__(ipl_image=copied)
 
+    def flipped_horizontal(self):
+        copied = self.copy()
+        flip_horizontal(copied._ipl_image)
+        return copied
+
+    def flipped_vertical(self):
+        copied = self.copy()
+        flip_horizontal(copied._ipl_image)
+        return copied
+
+    def flipped(self):
+        copied = self.copy()
+        flip(copied._ipl_image)
+        return copied
+
 
 @attributes(
     [
@@ -73,3 +88,21 @@ def invert(image, into=None):
     if into is None:
         into = image
     lib.cvNot(image._ipl_image, into._ipl_image)
+
+
+def flip_horizontal(array, into=None):
+    if into is None:
+        into = array
+    lib.cvFlip(array, into, 0)
+
+
+def flip_vertical(array, into=None):
+    if into is None:
+        into = array
+    lib.cvFlip(array, into, 1)
+
+
+def flip(array, into=None):
+    if into is None:
+        into = array
+    lib.cvFlip(array, into, -1)

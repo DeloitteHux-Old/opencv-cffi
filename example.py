@@ -23,8 +23,7 @@ def prettify(frame, facetangle):
     facetangle.draw_onto(frame)
 
     with frame.region_of_interest(facetangle.right_half) as right_half:
-        prettified = frame.copy()
-        lib.cvFlip(prettified._ipl_image, prettified._ipl_image, 1)
+        prettified = frame.flipped_horizontal()
 
         shift_left = Matrix.from_data(
             [1, 0, -right_half.width],
