@@ -23,12 +23,8 @@ def prettify(frame, facetangle):
     facetangle.draw_onto(frame)
 
     with frame.region_of_interest(facetangle.right_half) as right_half:
-        prettified = lib.cvCreateImage(
-            lib.cvGetSize(frame._ipl_image), frame.depth, frame.channels,
-        )
-
-        lib.cvCopy(frame._ipl_image, prettified, ffi.NULL)
-        lib.cvFlip(prettified, prettified, 1)
+        prettified = frame.copy()
+        lib.cvFlip(prettified._ipl_image, prettified._ipl_image, 1)
 
         shift_left = Matrix.from_data(
             [1, 0, -right_half.width],
@@ -36,14 +32,14 @@ def prettify(frame, facetangle):
         )
 
         lib.cvWarpAffine(
-            prettified,
-            prettified,
+            prettified._ipl_image,
+            prettified._ipl_image,
             shift_left._cv_mat,
             lib.CV_INTER_LINEAR + lib.CV_WARP_FILL_OUTLIERS,
             lib.cvScalarAll(0.0),
         )
 
-        lib.cvCopy(prettified, frame._ipl_image, ffi.NULL)
+        lib.cvCopy(prettified._ipl_image, frame._ipl_image, ffi.NULL)
 
 
 transform = uglify if sys.argv[2] == "uglify" else prettify

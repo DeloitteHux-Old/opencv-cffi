@@ -2,7 +2,7 @@ from contextlib import contextmanager
 
 from characteristic import Attribute, attributes
 
-from _opencv import lib
+from _opencv import ffi, lib
 
 
 @attributes(
@@ -24,6 +24,15 @@ class Image(object):
         lib.cvSetImageROI(self._ipl_image, rectangle._cv_rect)
         yield rectangle
         lib.cvResetImageROI(self._ipl_image)
+
+    def copy(self):
+        copied = lib.cvCreateImage(
+            lib.cvGetSize(self._ipl_image),
+            self.depth,
+            self.channels,
+        )
+        lib.cvCopy(self._ipl_image, copied, ffi.NULL)
+        return self.__class__(ipl_image=copied)
 
 
 @attributes(
