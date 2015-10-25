@@ -11,6 +11,9 @@ from _opencv import ffi, lib
     ],
 )
 class Image(object):
+    def __del__(self):
+        lib.cvReleaseImage(self._ipl_image)
+
     @property
     def depth(self):
         return self._ipl_image.depth
@@ -59,6 +62,12 @@ class Image(object):
     ],
 )
 class Matrix(object):
+    def __del__(self):
+        lib.cvReleaseData(self._cv_mat)
+
+    def __setitem__(self, (row, column), element):
+        lib.cvmSet(self._cv_mat, row, column, element)
+
     @classmethod
     def from_data(cls, *rows, **kwargs):
         if not rows:
@@ -94,9 +103,6 @@ class Matrix(object):
         matrix = cls.of_dimensions(**kwargs)
         lib.cvSetZero(matrix)
         return matrix
-
-    def __setitem__(self, (row, column), element):
-        lib.cvmSet(self._cv_mat, row, column, element)
 
     @property
     def rows(self):
