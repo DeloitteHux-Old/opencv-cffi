@@ -3,8 +3,7 @@ import sys
 
 from bp.filepath import FilePath
 
-from _opencv import ffi, lib
-from opencv_cffi.core import Matrix, copy, invert
+from opencv_cffi.core import invert
 from opencv_cffi.imaging import Camera
 from opencv_cffi.gui import ESCAPE, Window, key_pressed
 from opencv_cffi.object_detection import HaarClassifier
@@ -20,7 +19,7 @@ def uglify(frame, facetangle):
 
 
 def prettify(frame, facetangle):
-    with frame.region_of_interest(facetangle.right_half) as right_half:
+    with frame.region_of_interest(facetangle.right_half):
         prettified = frame.flipped_vertical()
 
     with frame.region_of_interest(facetangle.left_half):
