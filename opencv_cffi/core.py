@@ -47,7 +47,7 @@ class Image(object):
 
     def flipped_vertical(self):
         copied = self.copy()
-        flip_horizontal(copied._ipl_image)
+        flip_vertical(copied._ipl_image)
         return copied
 
     def flipped(self):
