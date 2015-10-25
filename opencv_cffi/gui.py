@@ -3,7 +3,11 @@ from characteristic import Attribute, attributes
 from _opencv import lib
 
 
-ESCAPE = ord("\x1b")
+ESCAPE = "\x1b"
+UP_ARROW = 63232
+DOWN_ARROW = 63233
+LEFT_ARROW = 63234
+RIGHT_ARROW = 63235
 
 
 @attributes(
@@ -32,4 +36,7 @@ class Window(object):
 
 
 def key_pressed(milliseconds=1):
-    return lib.cvWaitKey(milliseconds)
+    pressed = lib.cvWaitKey(milliseconds)
+    if 0 <= pressed <= 255:
+        return chr(pressed)
+    return pressed

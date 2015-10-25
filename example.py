@@ -27,6 +27,7 @@ def prettify(frame, facetangle):
         prettified.write_into(frame)
 
 
+original_transform = lambda frame, facetangle : None
 transform = uglify if sys.argv[2] == "uglify" else prettify
 
 
@@ -40,8 +41,11 @@ with Window(name="Front") as front_window:
         ],
     ):
         frame = next(frames)
-        if key_pressed() == ESCAPE:
+        pressed = key_pressed()
+        if pressed == ESCAPE:
             break
+        elif pressed == "\t":
+            original_transform, transform = transform, original_transform
 
         for rectangle in classifier.detect_objects(inside=frame):
             transform(frame=frame, facetangle=rectangle)
