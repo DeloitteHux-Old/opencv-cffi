@@ -111,7 +111,23 @@ typedef struct CvSeq {
 /*
 @deprecated CvMat is now obsolete; consider using Mat instead.
  */
-typedef struct CvMat { ...; } CvMat;
+typedef struct CvMat {
+    int type;
+    int step;
+
+    union
+    {
+        uchar* ptr;
+        short* s;
+        int* i;
+        float* fl;
+        double* db;
+    } data;
+
+    int rows;
+    int cols;
+    ...;
+} CvMat;
 typedef struct CvMatND { ...; } CvMatND;
 typedef struct CvSparseMat { ...; } CvSparseMat;
 typedef struct CvSparseNode { ...; } CvSparseNode;

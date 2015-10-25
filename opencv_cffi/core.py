@@ -83,7 +83,17 @@ class Matrix(object):
     def __setitem__(self, (row, column), element):
         lib.cvmSet(self._cv_mat, row, column, element)
 
+    @property
+    def rows(self):
+        return self._cv_mat.rows
+
+    @property
+    def columns(self):
+        return self._cv_mat.cols
+
     def warp_affine(self, image):
+        if self.rows != 2 or self.columns != 3:
+            raise TypeError("Affine transformations are 2x3 matrices.")
         warp_affine(matrix=self._cv_mat, array=image._ipl_image)
 
 
