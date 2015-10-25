@@ -34,12 +34,8 @@ with Window(name="Front") as front_window:
 
     front = Camera(index=0)
 
-    for window, frames in itertools.cycle(
-        [
-            (front_window, front.frames()),
-        ],
-    ):
-        frame = next(frames)
+    for frame in front.frames():
+
         pressed = key_pressed()
         if pressed == ESCAPE:
             break
@@ -49,4 +45,4 @@ with Window(name="Front") as front_window:
         for rectangle in classifier.detect_objects(inside=frame):
             transform(frame=frame, facetangle=rectangle)
 
-        window.show(frame)
+        front_window.show(frame)
