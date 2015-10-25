@@ -83,6 +83,9 @@ class Matrix(object):
     def __setitem__(self, (row, column), element):
         lib.cvmSet(self._cv_mat, row, column, element)
 
+    def warp_affine(self, image):
+        warp_affine(matrix=self._cv_mat, array=image._ipl_image)
+
 
 def copy(array, into=None):
     if into is None:
@@ -112,3 +115,15 @@ def flip(array, into=None):
     if into is None:
         into = array
     lib.cvFlip(array, into, -1)
+
+
+def warp_affine(matrix, array, into=None):
+    if into is None:
+        into = array
+    lib.cvWarpAffine(
+        array,
+        into,
+        matrix,
+        lib.CV_INTER_LINEAR + lib.CV_WARP_FILL_OUTLIERS,
+        lib.cvScalarAll(0.0),
+    )

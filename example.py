@@ -28,15 +28,7 @@ def prettify(frame, facetangle):
             [1, 0, -right_half.width],
             [0, 1, 0],
         )
-
-        lib.cvWarpAffine(
-            prettified._ipl_image,
-            prettified._ipl_image,
-            shift_left._cv_mat,
-            lib.CV_INTER_LINEAR + lib.CV_WARP_FILL_OUTLIERS,
-            lib.cvScalarAll(0.0),
-        )
-
+        shift_left.warp_affine(prettified)
         copy(array=prettified._ipl_image, into=frame._ipl_image)
 
 
