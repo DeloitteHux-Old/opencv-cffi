@@ -31,7 +31,7 @@ class Image(object):
             self.depth,
             self.channels,
         )
-        lib.cvCopy(self._ipl_image, copied, ffi.NULL)
+        copy(self._ipl_image, copied)
         return self.__class__(ipl_image=copied)
 
     def flipped_horizontal(self):
@@ -82,6 +82,12 @@ class Matrix(object):
 
     def __setitem__(self, (row, column), element):
         lib.cvmSet(self._cv_mat, row, column, element)
+
+
+def copy(array, into=None):
+    if into is None:
+        into = array
+    lib.cvCopy(array, into, ffi.NULL)
 
 
 def invert(image, into=None):
