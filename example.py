@@ -7,7 +7,7 @@ Usage:
 
 """
 
-
+from time import time
 import itertools
 import sys
 
@@ -52,8 +52,14 @@ with Window(name="Front") as front_window:
 
     front = Camera(index=0)
     transform = prettify
+    this_second, first_frame_this_second = time(), 0
 
-    for frame in front.frames():
+    for count, frame in enumerate(front.frames()):
+
+        now = time()
+        if now - this_second >= 1:
+            print "~{0} fps".format(count - first_frame_this_second)
+            this_second, first_frame_this_second = now, count
 
         pressed = key_pressed()
         if pressed == ESCAPE:
