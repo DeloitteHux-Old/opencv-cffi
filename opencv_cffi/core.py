@@ -84,7 +84,8 @@ class Matrix(object):
 
     @classmethod
     def of_dimensions(cls, rows, columns, **kwargs):
-        return cls(cv_mat=lib.cvCreateMat(rows, columns, 6), **kwargs)
+        cv_mat = lib.cvCreateMat(rows, columns, lib.CV_64FC1)
+        return cls(cv_mat=cv_mat, **kwargs)
 
     @classmethod
     def translation(cls, x=0, y=0, **kwargs):
