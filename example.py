@@ -26,27 +26,38 @@ def prettify(frame, facetangle):
         prettified.write_into(frame)
 
 
-original_draw = lambda frame, facetangle : facetangle.draw_onto(frame)
-original_transform = draw = lambda frame, facetangle : None
-transform = uglify if sys.argv[2] == "uglify" else prettify
+def untransformed(frame, facetangle):
+    pass
+
+
+def debug(transform):
+    def _debug(frame, facetangle):
+        facetangle.draw_onto(frame)
+        transform(frame=frame, facetangle=facetangle)
+    return _debug
+
 
 
 with Window(name="Front") as front_window:
 
     front = Camera(index=0)
+    transform = prettify
 
     for frame in front.frames():
 
         pressed = key_pressed()
         if pressed == ESCAPE:
             break
-        elif pressed == "\t":
-            original_transform, transform = transform, original_transform
+        elif pressed == "0":
+            transform = untransformed
+        elif pressed == "p":
+            transform = prettify
+        elif pressed == "u":
+            transform = uglify
         elif pressed == "D":
-            original_draw, draw = draw, original_draw
+            transform = debug(transform)
 
         for rectangle in classifier.detect_objects(inside=frame):
-            draw(frame=frame, facetangle=rectangle)
             transform(frame=frame, facetangle=rectangle)
 
         front_window.show(frame)
