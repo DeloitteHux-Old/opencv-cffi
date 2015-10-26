@@ -1,3 +1,13 @@
+"""
+Now you're symmetric! Maybe. Sort of.
+
+Usage:
+
+    $ pypy example.py ~/Desktop/haarcascade_frontalface_default.xml
+
+"""
+
+
 import itertools
 import sys
 
