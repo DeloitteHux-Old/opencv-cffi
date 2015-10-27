@@ -29,15 +29,22 @@ class Rectangle(object):
     def from_chars(cls, chars):
         return cls(cv_rect=ffi.cast("CvRect *", chars))
 
-    def draw_onto(self, frame):
+    def draw_onto(
+        self,
+        frame,
+        color=lib.cvScalar(255, 0, 0, 0),
+        line_thickness=1,
+        line_type=8,
+        shift=0,
+    ):
         lib.cvRectangle(
             frame._ipl_image,
             self.top_left,
             self.bottom_right,
-            lib.cvScalar(255, 0, 0, 0),
-            1,
-            8,
-            0,
+            color,
+            line_thickness,
+            line_type,
+            shift,
         )
 
     @property
