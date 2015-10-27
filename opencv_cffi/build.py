@@ -207,6 +207,12 @@ typedef struct CvPoint {
     int y;
 } CvPoint;
 
+/* "black box" capture structure */
+typedef struct CvCapture CvCapture;
+/* "black box" video file writer structure */
+
+typedef struct CvVideoWriter CvVideoWriter;
+
 /****************************************************************************************\
 *                   Arithmetic, logic and comparison operations                          *
 \****************************************************************************************/
@@ -1486,34 +1492,21 @@ CVAPI(void)  cvWarpAffine( const CvArr* src, CvArr* dst, const CvMat* map_matrix
 #define IPL_BORDER_REFLECT    ...
 #define IPL_BORDER_WRAP       ...
 
-/* "black box" capture structure */
-typedef struct CvCapture CvCapture;
-
-/* start capturing frames from video file */
-CvCapture* cvCreateFileCapture( const char* filename );
-
-/* start capturing frames from camera: index = camera_index + domain_offset (CV_CAP_*) */
-CvCapture* cvCreateCameraCapture( int index );
-
-/* retrieve or set capture properties */
-double cvGetCaptureProperty( CvCapture* capture, int property_id );
-int    cvSetCaptureProperty( CvCapture* capture, int property_id, double value );
-
 /** Sub-pixel interpolation methods */
 enum
 {
-    CV_INTER_NN        =0,
-    CV_INTER_LINEAR    =1,
-    CV_INTER_CUBIC     =2,
-    CV_INTER_AREA      =3,
-    CV_INTER_LANCZOS4  =4
+    CV_INTER_NN        =...,
+    CV_INTER_LINEAR    =...,
+    CV_INTER_CUBIC     =...,
+    CV_INTER_AREA      =...,
+    CV_INTER_LANCZOS4  =...
 };
 
 /** ... and other image warping flags */
 enum
 {
-    CV_WARP_FILL_OUTLIERS =8,
-    CV_WARP_INVERSE_MAP  =16
+    CV_WARP_FILL_OUTLIERS =...,
+    CV_WARP_INVERSE_MAP  =...
 };
 
 /** Shapes of a structuring element for morphological operations
@@ -1521,22 +1514,22 @@ enum
 */
 enum MorphShapes_c
 {
-    CV_SHAPE_RECT      =0,
-    CV_SHAPE_CROSS     =1,
-    CV_SHAPE_ELLIPSE   =2,
-    CV_SHAPE_CUSTOM    =100 //!< custom structuring element
+    CV_SHAPE_RECT      =...,
+    CV_SHAPE_CROSS     =...,
+    CV_SHAPE_ELLIPSE   =...,
+    CV_SHAPE_CUSTOM    =... //!< custom structuring element
 };
 
 /** Morphological operations */
 enum
 {
-    CV_MOP_ERODE        =0,
-    CV_MOP_DILATE       =1,
-    CV_MOP_OPEN         =2,
-    CV_MOP_CLOSE        =3,
-    CV_MOP_GRADIENT     =4,
-    CV_MOP_TOPHAT       =5,
-    CV_MOP_BLACKHAT     =6
+    CV_MOP_ERODE        =...,
+    CV_MOP_DILATE       =...,
+    CV_MOP_OPEN         =...,
+    CV_MOP_CLOSE        =...,
+    CV_MOP_GRADIENT     =...,
+    CV_MOP_TOPHAT       =...,
+    CV_MOP_BLACKHAT     =...
 };
 
 enum
@@ -1708,15 +1701,161 @@ typedef void (* Cv_iplDeallocate)(IplImage*,int);
 typedef IplROI* (* Cv_iplCreateROI)(int,int,int,int,int);
 typedef IplImage* (* Cv_iplCloneImage)(const IplImage*);
 
-/* Just a combination of cvGrabFrame and cvRetrieveFrame
-!!!DO NOT RELEASE or MODIFY the retrieved frame!!!      */
-IplImage* cvQueryFrame( CvCapture* capture );
+/****************************************************************************************\
+*                         Working with Video Files and Cameras                           *
+\****************************************************************************************/
 
-/* "black box" video file writer structure */
-typedef struct CvVideoWriter CvVideoWriter;
+/* start capturing frames from video file */
+CVAPI(CvCapture*) cvCreateFileCapture( const char* filename );
+
+/* start capturing frames from video file. allows specifying a preferred API to use */
+CVAPI(CvCapture*) cvCreateFileCaptureWithPreference( const char* filename , int apiPreference);
+
+enum
+{
+    CV_CAP_ANY      =...,     // autodetect
+
+    CV_CAP_MIL      =...,   // MIL proprietary drivers
+
+    CV_CAP_VFW      =...,   // platform native
+    CV_CAP_V4L      =...,
+    CV_CAP_V4L2     =...,
+
+    CV_CAP_FIREWARE =...,   // IEEE 1394 drivers
+    CV_CAP_FIREWIRE =...,
+    CV_CAP_IEEE1394 =...,
+    CV_CAP_DC1394   =...,
+    CV_CAP_CMU1394  =...,
+
+    CV_CAP_STEREO   =...,   // TYZX proprietary drivers
+    CV_CAP_TYZX     =...,
+    CV_TYZX_LEFT    =...,
+    CV_TYZX_RIGHT   =...,
+    CV_TYZX_COLOR   =...,
+    CV_TYZX_Z       =...,
+
+    CV_CAP_QT       =...,   // QuickTime
+
+    CV_CAP_UNICAP   =...,   // Unicap drivers
+
+    CV_CAP_DSHOW    =...,   // DirectShow (via videoInput)
+    CV_CAP_MSMF     =...,  // Microsoft Media Foundation (via videoInput)
+
+    CV_CAP_PVAPI    =...,   // PvAPI, Prosilica GigE SDK
+
+    CV_CAP_OPENNI   =...,   // OpenNI (for Kinect)
+    CV_CAP_OPENNI_ASUS =...,   // OpenNI (for Asus Xtion)
+
+    CV_CAP_ANDROID  =...,  // Android - not used
+    CV_CAP_ANDROID_BACK =..., // Android back camera - not used
+    CV_CAP_ANDROID_FRONT =..., // Android front camera - not used
+
+    CV_CAP_XIAPI    =...,   // XIMEA Camera API
+
+    CV_CAP_AVFOUNDATION = ...,  // AVFoundation framework for iOS (OS X Lion will have the same API)
+
+    CV_CAP_GIGANETIX = ...,  // Smartek Giganetix GigEVisionSDK
+
+    CV_CAP_INTELPERC = ..., // Intel Perceptual Computing
+
+    CV_CAP_OPENNI2 = ...,   // OpenNI2 (for Kinect)
+    CV_CAP_GPHOTO2 = ...,
+    CV_CAP_GSTREAMER = ..., // GStreamer
+    CV_CAP_FFMPEG = ...,    // FFMPEG
+    CV_CAP_IMAGES = ...     // OpenCV Image Sequence (e.g. img_%02d.jpg)
+};
+
+/* start capturing frames from camera: index = camera_index + domain_offset (CV_CAP_*) */
+CVAPI(CvCapture*) cvCreateCameraCapture( int index );
+
+/* grab a frame, return 1 on success, 0 on fail.
+  this function is thought to be fast               */
+CVAPI(int) cvGrabFrame( CvCapture* capture );
+
+/* get the frame grabbed with cvGrabFrame(..)
+  This function may apply some frame processing like
+  frame decompression, flipping etc.
+  !!!DO NOT RELEASE or MODIFY the retrieved frame!!! */
+CVAPI(IplImage*) cvRetrieveFrame( CvCapture* capture, int streamIdx CV_DEFAULT(0) );
+
+/* Just a combination of cvGrabFrame and cvRetrieveFrame
+   !!!DO NOT RELEASE or MODIFY the retrieved frame!!!      */
+CVAPI(IplImage*) cvQueryFrame( CvCapture* capture );
+
+/* stop capturing/reading and free resources */
+CVAPI(void) cvReleaseCapture( CvCapture** capture );
+
+// Generic camera output modes.
+// Currently, these are supported through the libv4l interface only.
+enum
+{
+    CV_CAP_MODE_BGR  = ..., // BGR24 (default)
+    CV_CAP_MODE_RGB  = ..., // RGB24
+    CV_CAP_MODE_GRAY = ..., // Y8
+    CV_CAP_MODE_YUYV = ...  // YUYV
+};
+
+enum
+{
+    // Data given from depth generator.
+    CV_CAP_OPENNI_DEPTH_MAP                 = ..., // Depth values in mm (CV_16UC1)
+    CV_CAP_OPENNI_POINT_CLOUD_MAP           = ..., // XYZ in meters (CV_32FC3)
+    CV_CAP_OPENNI_DISPARITY_MAP             = ..., // Disparity in pixels (CV_8UC1)
+    CV_CAP_OPENNI_DISPARITY_MAP_32F         = ..., // Disparity in pixels (CV_32FC1)
+    CV_CAP_OPENNI_VALID_DEPTH_MASK          = ..., // CV_8UC1
+
+    // Data given from RGB image generator.
+    CV_CAP_OPENNI_BGR_IMAGE                 = ...,
+    CV_CAP_OPENNI_GRAY_IMAGE                = ...
+};
+
+// Supported output modes of OpenNI image generator
+enum
+{
+    CV_CAP_OPENNI_VGA_30HZ     = ...,
+    CV_CAP_OPENNI_SXGA_15HZ    = ...,
+    CV_CAP_OPENNI_SXGA_30HZ    = ...,
+    CV_CAP_OPENNI_QVGA_30HZ    = ...,
+    CV_CAP_OPENNI_QVGA_60HZ    = ...
+};
+
+enum
+{
+    CV_CAP_INTELPERC_DEPTH_MAP              = ..., // Each pixel is a 16-bit integer. The value indicates the distance from an object to the camera's XY plane or the Cartesian depth.
+    CV_CAP_INTELPERC_UVDEPTH_MAP            = ..., // Each pixel contains two 32-bit floating point values in the range of 0-1, representing the mapping of depth coordinates to the color coordinates.
+    CV_CAP_INTELPERC_IR_MAP                 = ..., // Each pixel is a 16-bit integer. The value indicates the intensity of the reflected laser beam.
+    CV_CAP_INTELPERC_IMAGE                  = ...
+};
+
+// gPhoto2 properties, if propertyId is less than 0 then work on widget with that __additive inversed__ camera setting ID
+// Get IDs by using CAP_PROP_GPHOTO2_WIDGET_ENUMERATE.
+// @see CvCaptureCAM_GPHOTO2 for more info
+enum
+{
+    CV_CAP_PROP_GPHOTO2_PREVIEW           = ..., // Capture only preview from liveview mode.
+    CV_CAP_PROP_GPHOTO2_WIDGET_ENUMERATE  = ..., // Readonly, returns (const char *).
+    CV_CAP_PROP_GPHOTO2_RELOAD_CONFIG     = ..., // Trigger, only by set. Reload camera settings.
+    CV_CAP_PROP_GPHOTO2_RELOAD_ON_CHANGE  = ..., // Reload all settings on set.
+    CV_CAP_PROP_GPHOTO2_COLLECT_MSGS      = ..., // Collect messages with details.
+    CV_CAP_PROP_GPHOTO2_FLUSH_MSGS        = ..., // Readonly, returns (const char *).
+    CV_CAP_PROP_SPEED                     = ..., // Exposure speed. Can be readonly, depends on camera program.
+    CV_CAP_PROP_APERTURE                  = ..., // Aperture. Can be readonly, depends on camera program.
+    CV_CAP_PROP_EXPOSUREPROGRAM           = ..., // Camera exposure program.
+    CV_CAP_PROP_VIEWFINDER                = ...  // Enter liveview mode.
+};
+
+/* retrieve or set capture properties */
+CVAPI(double) cvGetCaptureProperty( CvCapture* capture, int property_id );
+CVAPI(int)    cvSetCaptureProperty( CvCapture* capture, int property_id, double value );
+
+// Return the type of the capturer (eg, CV_CAP_V4W, CV_CAP_UNICAP), which is unknown if created with CV_CAP_ANY
+CVAPI(int)    cvGetCaptureDomain( CvCapture* capture);
+
+#define CV_FOURCC_PROMPT ...  /* Open Codec Selection Dialog (Windows only) */
+#define CV_FOURCC_DEFAULT ... /* Use default codec for specified filename (Linux only) */
 
 /* initialize video file writer */
-CvVideoWriter* cvCreateVideoWriter( const char* filename, int fourcc,
+CVAPI(CvVideoWriter*) cvCreateVideoWriter( const char* filename, int fourcc,
                                            double fps, CvSize frame_size,
                                            int is_color );
 
