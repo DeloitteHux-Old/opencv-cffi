@@ -12,7 +12,7 @@ class InitializationError(Exception):
 
 @attributes(
     [
-        Attribute(name="index"),
+        Attribute(name="index", default_value=lib.CV_CAP_ANY),
     ],
 )
 class Camera(object):

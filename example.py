@@ -50,7 +50,7 @@ def debug(transform):
 
 with Window(name="Front") as front_window:
 
-    front = Camera(index=0)
+    front = Camera()
     transform = prettify
     this_second, first_frame_this_second = time(), 0
 
