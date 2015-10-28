@@ -7,6 +7,23 @@ from _opencv import ffi, lib
 
 @attributes(
     [
+        Attribute(name="red", default_value=0),
+        Attribute(name="blue", default_value=0),
+        Attribute(name="green", default_value=0),
+        Attribute(name="alpha", default_value=0),
+    ],
+)
+class Color(object):
+    pass
+
+
+Color.RED = Color(red=255)
+Color.BLUE = Color(blue=255)
+Color.GREEN = Color(green=255)
+
+
+@attributes(
+    [
         Attribute(name="_ipl_image")
     ],
 )

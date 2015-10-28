@@ -32,7 +32,7 @@ class Rectangle(object):
     def draw_onto(
         self,
         frame,
-        color=lib.cvScalar(255, 0, 0, 0),
+        color,
         line_thickness=1,
         line_type=8,
         shift=0,
@@ -41,7 +41,7 @@ class Rectangle(object):
             frame._ipl_image,
             self.top_left,
             self.bottom_right,
-            color,
+            [[color.blue, color.green, color.red, color.alpha]],
             line_thickness,
             line_type,
             shift,

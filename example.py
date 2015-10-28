@@ -13,7 +13,7 @@ import sys
 
 from bp.filepath import FilePath
 
-from opencv_cffi.core import invert
+from opencv_cffi.core import Color, invert
 from opencv_cffi.imaging import Camera
 from opencv_cffi.gui import ESCAPE, Window, key_pressed
 from opencv_cffi.object_detection import HaarClassifier
@@ -42,7 +42,7 @@ def untransformed(frame, facetangle):
 
 def debug(transform):
     def _debug(frame, facetangle):
-        facetangle.draw_onto(frame)
+        facetangle.draw_onto(frame, color=Color.GREEN)
         transform(frame=frame, facetangle=facetangle)
     return _debug
 
