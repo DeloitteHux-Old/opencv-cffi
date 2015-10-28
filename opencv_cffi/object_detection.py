@@ -1,7 +1,11 @@
 from characteristic import Attribute, attributes
 
-from _opencv import lib
+from _opencv import ffi, lib
 from opencv_cffi._types import Rectangle, Sequence
+
+
+class _CannotLoadClassifierCascade(Exception):
+    pass
 
 
 @attributes(
@@ -38,7 +42,8 @@ class HaarClassifier(object):
             path.path,
             lib.cvSize(1, 1),
         )
-        assert cascade is not None
+        if cascade == ffi.NULL:
+            raise _CannotLoadClassifierCascade(path, cascade)
         return cls(cascade=cascade, **kwargs)
 
     def detect_objects(self, inside):
