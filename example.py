@@ -8,14 +8,13 @@ Usage:
 """
 
 from time import time
-import itertools
 import sys
 
 from bp.filepath import FilePath
 
 from opencv_cffi.core import Color, invert
 from opencv_cffi.imaging import Camera
-from opencv_cffi.gui import ESCAPE, Window, key_pressed
+from opencv_cffi.gui import ESCAPE, Window
 from opencv_cffi.object_detection import HaarClassifier
 
 
@@ -47,33 +46,33 @@ def debug(transform):
     return _debug
 
 
+class Symmetrizer(object):
+
+    transform = staticmethod(prettify)
+
+    def handle_input(self, key):
+        if key == ESCAPE:
+            sys.exit()
+        elif key == "0":
+            self.transform = untransformed
+        elif key == "p":
+            self.transform = prettify
+        elif key == "u":
+            self.transform = uglify
+        elif key == "D":
+            self.transform = debug(self.transform)
+
+    def symmetrized(self, camera=None):
+        if camera is None:
+            camera = Camera()
+        for frame in camera.frames():
+            for facetangle in classifier.detect_objects(inside=frame):
+                self.transform(frame=frame, facetangle=facetangle)
+            yield frame
+
 
 with Window(name="Front") as front_window:
-
-    front = Camera()
-    transform = prettify
-    this_second, first_frame_this_second = time(), 0
-
-    for count, frame in enumerate(front.frames()):
-
-        now = time()
-        if now - this_second >= 1:
-            print "~{0} fps".format(count - first_frame_this_second)
-            this_second, first_frame_this_second = now, count
-
-        pressed = key_pressed()
-        if pressed == ESCAPE:
-            break
-        elif pressed == "0":
-            transform = untransformed
-        elif pressed == "p":
-            transform = prettify
-        elif pressed == "u":
-            transform = uglify
-        elif pressed == "D":
-            transform = debug(transform)
-
-        for rectangle in classifier.detect_objects(inside=frame):
-            transform(frame=frame, facetangle=rectangle)
-
-        front_window.show(frame)
+    symmetrizer = Symmetrizer()
+    front_window.loop_over(
+        symmetrizer.symmetrized(), handle_input=symmetrizer.handle_input,
+    )
