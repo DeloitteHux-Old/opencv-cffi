@@ -31,12 +31,21 @@ class Window(object):
     def close(self):
         lib.cvDestroyWindow(self.name)
 
-    def show(self, image):
+    def _show(self, image):
         lib.cvShowImage(self.name, image._ipl_image)
 
+    def loop_over(self, images, handle_input=lambda key : None, delay=25):
+        for image in images:
+            self._show(image)
 
-def key_pressed(milliseconds=1):
-    pressed = lib.cvWaitKey(milliseconds)
-    if 0 <= pressed <= 255:
-        return chr(pressed)
-    return pressed
+            keycode = lib.cvWaitKey(delay)
+            nothing_was_pressed = keycode == -1
+            if nothing_was_pressed:
+                continue
+
+            if 0 <= keycode <= 255:
+                key = chr(keycode)
+            else:
+                key = keycode
+
+            handle_input(key=key)
