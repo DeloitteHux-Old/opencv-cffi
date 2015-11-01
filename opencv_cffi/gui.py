@@ -4,10 +4,12 @@ from _opencv import lib
 
 
 ESCAPE = "\x1b"
-UP_ARROW = 63232
-DOWN_ARROW = 63233
-LEFT_ARROW = 63234
-RIGHT_ARROW = 63235
+_KEYCODES_TO_NAMES = {
+    62232 : "up",
+    62233 : "down",
+    62234 : "left",
+    62235 : "right",
+}
 
 
 @attributes(
@@ -55,4 +57,4 @@ class Window(object):
 def _keycode_to_key(keycode):
     if 0 <= keycode <= 255:
         return chr(keycode)
-    return keycode
+    return _KEYCODES_TO_NAMES.get(keycode, keycode)
