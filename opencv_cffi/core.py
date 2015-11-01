@@ -28,6 +28,11 @@ Color.GREEN = Color(green=255)
     ],
 )
 class Image(object):
+    @classmethod
+    def from_path(cls, path):
+        ipl_image = lib.cvLoadImage(path.path, lib.CV_LOAD_IMAGE_COLOR)
+        return cls(cv_arr=ipl_image)
+
     @property
     def depth(self):
         return self._cv_arr.depth
