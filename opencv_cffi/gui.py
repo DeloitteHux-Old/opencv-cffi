@@ -32,7 +32,7 @@ class Window(object):
         lib.cvDestroyWindow(self.name)
 
     def _show(self, image):
-        lib.cvShowImage(self.name, image._ipl_image)
+        lib.cvShowImage(self.name, image._cv_arr)
 
     def loop_over(self, images, handle_input=lambda key : None, delay=25):
         for image in images:

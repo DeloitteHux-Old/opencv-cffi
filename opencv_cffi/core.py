@@ -24,61 +24,66 @@ Color.GREEN = Color(green=255)
 
 @attributes(
     [
-        Attribute(name="_ipl_image")
+        Attribute(name="_cv_arr")
     ],
 )
 class Image(object):
     @property
     def depth(self):
-        return self._ipl_image.depth
+        return self._cv_arr.depth
 
     @property
     def channels(self):
-        return self._ipl_image.nChannels
+        return self._cv_arr.nChannels
 
     @contextmanager
     def region_of_interest(self, rectangle):
-        lib.cvSetImageROI(self._ipl_image, rectangle._cv_rect)
+        lib.cvSetImageROI(self._cv_arr, rectangle._cv_rect)
         yield rectangle
-        lib.cvResetImageROI(self._ipl_image)
+        lib.cvResetImageROI(self._cv_arr)
 
     def copy(self):
         copied = lib.cvCreateImage(
-            lib.cvGetSize(self._ipl_image),
+            lib.cvGetSize(self._cv_arr),
             self.depth,
             self.channels,
         )
         ffi.gc(copied, lib.cvReleaseImage)
-        copy(self._ipl_image, copied)
-        return self.__class__(ipl_image=copied)
+        copy(self._cv_arr, copied)
+        return self.__class__(cv_arr=copied)
+
+    def to_matrix(self):
+        cv_mat = ffi.new("CvMat *")
+        lib.cvGetMat(self._cv_arr, cv_mat, ffi.NULL, 0)
+        return Matrix(cv_arr=cv_mat)
 
     def write_into(self, image):
-        copy(array=self._ipl_image, into=image._ipl_image)
+        copy(array=self._cv_arr, into=image._cv_arr)
 
     def flipped_horizontal(self):
         copied = self.copy()
-        flip_horizontal(copied._ipl_image)
+        flip_horizontal(copied._cv_arr)
         return copied
 
     def flipped_vertical(self):
         copied = self.copy()
-        flip_vertical(copied._ipl_image)
+        flip_vertical(copied._cv_arr)
         return copied
 
     def flipped(self):
         copied = self.copy()
-        flip(copied._ipl_image)
+        flip(copied._cv_arr)
         return copied
 
 
 @attributes(
     [
-        Attribute(name="_cv_mat")
+        Attribute(name="_cv_arr")
     ],
 )
 class Matrix(object):
     def __setitem__(self, (row, column), element):
-        lib.cvmSet(self._cv_mat, row, column, element)
+        lib.cvmSet(self._cv_arr, row, column, element)
 
     @classmethod
     def from_data(cls, *rows, **kwargs):
@@ -97,8 +102,7 @@ class Matrix(object):
     @classmethod
     def of_dimensions(cls, rows, columns, **kwargs):
         cv_mat = lib.cvCreateMat(rows, columns, lib.CV_64FC1)
-        ffi.gc(cv_mat, lib.cvReleaseData)
-        return cls(cv_mat=cv_mat, **kwargs)
+        return cls(cv_arr=cv_mat, **kwargs)
 
     @classmethod
     def translation(cls, x=0, y=0, **kwargs):
@@ -115,21 +119,21 @@ class Matrix(object):
     @classmethod
     def zeros(cls, **kwargs):
         matrix = cls.of_dimensions(**kwargs)
-        lib.cvSetZero(matrix._cv_mat)
+        lib.cvSetZero(matrix._cv_arr)
         return matrix
 
     @property
     def rows(self):
-        return self._cv_mat.rows
+        return self._cv_arr.rows
 
     @property
     def columns(self):
-        return self._cv_mat.cols
+        return self._cv_arr.cols
 
     def warp_affine(self, image):
         if self.rows != 2 or self.columns != 3:
             raise TypeError("Affine transformations are 2x3 matrices.")
-        warp_affine(matrix=self._cv_mat, array=image._ipl_image)
+        warp_affine(matrix=self._cv_arr, array=image._cv_arr)
 
 
 def copy(array, into=None):
@@ -141,7 +145,7 @@ def copy(array, into=None):
 def invert(image, into=None):
     if into is None:
         into = image
-    lib.cvNot(image._ipl_image, into._ipl_image)
+    lib.cvNot(image._cv_arr, into._cv_arr)
 
 
 def flip_horizontal(array, into=None):
