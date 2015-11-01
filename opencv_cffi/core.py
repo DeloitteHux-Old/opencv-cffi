@@ -115,7 +115,7 @@ class Matrix(object):
     @classmethod
     def zeros(cls, **kwargs):
         matrix = cls.of_dimensions(**kwargs)
-        lib.cvSetZero(matrix)
+        lib.cvSetZero(matrix._cv_mat)
         return matrix
 
     @property
