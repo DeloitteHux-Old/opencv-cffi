@@ -214,126 +214,6 @@ typedef struct CvCapture CvCapture;
 typedef struct CvVideoWriter CvVideoWriter;
 
 /****************************************************************************************\
-*                   Arithmetic, logic and comparison operations                          *
-\****************************************************************************************/
-
-/** dst(mask) = src1(mask) + src2(mask) */
-CVAPI(void)  cvAdd( const CvArr* src1, const CvArr* src2, CvArr* dst,
-                    const CvArr* mask CV_DEFAULT(NULL));
-
-/** dst(mask) = src(mask) + value */
-CVAPI(void)  cvAddS( const CvArr* src, CvScalar value, CvArr* dst,
-                     const CvArr* mask CV_DEFAULT(NULL));
-
-/** dst(mask) = src1(mask) - src2(mask) */
-CVAPI(void)  cvSub( const CvArr* src1, const CvArr* src2, CvArr* dst,
-                    const CvArr* mask CV_DEFAULT(NULL));
-
-/** dst(mask) = src(mask) - value = src(mask) + (-value) */
-void  cvSubS( const CvArr* src, CvScalar value, CvArr* dst,
-                         const CvArr* mask CV_DEFAULT(NULL));
-
-/** dst(mask) = value - src(mask) */
-CVAPI(void)  cvSubRS( const CvArr* src, CvScalar value, CvArr* dst,
-                      const CvArr* mask CV_DEFAULT(NULL));
-
-/** dst(idx) = src1(idx) * src2(idx) * scale
-   (scaled element-wise multiplication of 2 arrays) */
-CVAPI(void)  cvMul( const CvArr* src1, const CvArr* src2,
-                    CvArr* dst, double scale CV_DEFAULT(1) );
-
-/** element-wise division/inversion with scaling:
-    dst(idx) = src1(idx) * scale / src2(idx)
-    or dst(idx) = scale / src2(idx) if src1 == 0 */
-CVAPI(void)  cvDiv( const CvArr* src1, const CvArr* src2,
-                    CvArr* dst, double scale CV_DEFAULT(1));
-
-/** dst = src1 * scale + src2 */
-CVAPI(void)  cvScaleAdd( const CvArr* src1, CvScalar scale,
-                         const CvArr* src2, CvArr* dst );
-
-/** dst = src1 * alpha + src2 * beta + gamma */
-CVAPI(void)  cvAddWeighted( const CvArr* src1, double alpha,
-                            const CvArr* src2, double beta,
-                            double gamma, CvArr* dst );
-
-/** @brief Calculates the dot product of two arrays in Euclidean metrics.
-
-The function calculates and returns the Euclidean dot product of two arrays.
-
-\f[src1  \bullet src2 =  \sum _I ( \texttt{src1} (I)  \texttt{src2} (I))\f]
-
-In the case of multiple channel arrays, the results for all channels are accumulated. In particular,
-cvDotProduct(a,a) where a is a complex vector, will return \f$||\texttt{a}||^2\f$. The function can
-process multi-dimensional arrays, row by row, layer by layer, and so on.
-@param src1 The first source array
-@param src2 The second source array
- */
-CVAPI(double)  cvDotProduct( const CvArr* src1, const CvArr* src2 );
-
-/** dst(idx) = src1(idx) & src2(idx) */
-CVAPI(void) cvAnd( const CvArr* src1, const CvArr* src2,
-                  CvArr* dst, const CvArr* mask CV_DEFAULT(NULL));
-
-/** dst(idx) = src(idx) & value */
-CVAPI(void) cvAndS( const CvArr* src, CvScalar value,
-                   CvArr* dst, const CvArr* mask CV_DEFAULT(NULL));
-
-/** dst(idx) = src1(idx) | src2(idx) */
-CVAPI(void) cvOr( const CvArr* src1, const CvArr* src2,
-                 CvArr* dst, const CvArr* mask CV_DEFAULT(NULL));
-
-/** dst(idx) = src(idx) | value */
-CVAPI(void) cvOrS( const CvArr* src, CvScalar value,
-                  CvArr* dst, const CvArr* mask CV_DEFAULT(NULL));
-
-/** dst(idx) = src1(idx) ^ src2(idx) */
-CVAPI(void) cvXor( const CvArr* src1, const CvArr* src2,
-                  CvArr* dst, const CvArr* mask CV_DEFAULT(NULL));
-
-/** dst(idx) = src(idx) ^ value */
-CVAPI(void) cvXorS( const CvArr* src, CvScalar value,
-                   CvArr* dst, const CvArr* mask CV_DEFAULT(NULL));
-
-/** dst(idx) = ~src(idx) */
-CVAPI(void) cvNot( const CvArr* src, CvArr* dst );
-
-/** dst(idx) = lower(idx) <= src(idx) < upper(idx) */
-CVAPI(void) cvInRange( const CvArr* src, const CvArr* lower,
-                      const CvArr* upper, CvArr* dst );
-
-/** dst(idx) = lower <= src(idx) < upper */
-CVAPI(void) cvInRangeS( const CvArr* src, CvScalar lower,
-                       CvScalar upper, CvArr* dst );
-
-/** The comparison operation support single-channel arrays only.
-   Destination image should be 8uC1 or 8sC1 */
-
-/** dst(idx) = src1(idx) _cmp_op_ src2(idx) */
-CVAPI(void) cvCmp( const CvArr* src1, const CvArr* src2, CvArr* dst, int cmp_op );
-
-/** dst(idx) = src1(idx) _cmp_op_ value */
-CVAPI(void) cvCmpS( const CvArr* src, double value, CvArr* dst, int cmp_op );
-
-/** dst(idx) = min(src1(idx),src2(idx)) */
-CVAPI(void) cvMin( const CvArr* src1, const CvArr* src2, CvArr* dst );
-
-/** dst(idx) = max(src1(idx),src2(idx)) */
-CVAPI(void) cvMax( const CvArr* src1, const CvArr* src2, CvArr* dst );
-
-/** dst(idx) = min(src(idx),value) */
-CVAPI(void) cvMinS( const CvArr* src, double value, CvArr* dst );
-
-/** dst(idx) = max(src(idx),value) */
-CVAPI(void) cvMaxS( const CvArr* src, double value, CvArr* dst );
-
-/** dst(x,y,c) = abs(src1(x,y,c) - src2(x,y,c)) */
-CVAPI(void) cvAbsDiff( const CvArr* src1, const CvArr* src2, CvArr* dst );
-
-/** dst(x,y,c) = abs(src(x,y,c) - value(c)) */
-CVAPI(void) cvAbsDiffS( const CvArr* src, CvArr* dst, CvScalar value );
-
-/****************************************************************************************\
 *          Array allocation, deallocation, initialization and access to elements         *
 \****************************************************************************************/
 
@@ -479,6 +359,8 @@ allocated using cvCreateData or set explicitly to user-allocated data via cvSetD
 @param type Type of the matrix elements, see cvCreateMat
  */
 CVAPI(CvMat*)  cvCreateMatHeader( int rows, int cols, int type );
+
+#define CV_AUTOSTEP  ...
 
 /** @brief Initializes a pre-allocated matrix header.
 
@@ -758,8 +640,21 @@ hash table. The sample below demonstrates how to iterate through the sparse matr
  */
 CvSparseNode* cvGetNextSparseNode( CvSparseMatIterator* mat_iterator );
 
+#define CV_MAX_ARR ...
+
 /** matrix iterator: used for n-ary operations on dense arrays */
-typedef struct CvNArrayIterator { ...; } CvNArrayIterator;
+typedef struct CvNArrayIterator
+{
+    int count; /**< number of arrays */
+    int dims; /**< number of dimensions to iterate */
+    CvSize size; /**< maximal common linear size: { width = size, height = 1 } */
+    ...;
+}
+CvNArrayIterator;
+
+#define CV_NO_DEPTH_CHECK     ...
+#define CV_NO_CN_CHECK        ...
+#define CV_NO_SIZE_CHECK      ...
 
 /** initializes iterator that traverses through several arrays simulteneously
    (the function together with cvNextArraySlice is used for
@@ -1213,6 +1108,126 @@ CVAPI(void)  cvConvertScaleAbs( const CvArr* src, CvArr* dst,
 CVAPI(CvTermCriteria) cvCheckTermCriteria( CvTermCriteria criteria,
                                            double default_eps,
                                            int default_max_iters );
+
+/****************************************************************************************\
+*                   Arithmetic, logic and comparison operations                          *
+\****************************************************************************************/
+
+/** dst(mask) = src1(mask) + src2(mask) */
+CVAPI(void)  cvAdd( const CvArr* src1, const CvArr* src2, CvArr* dst,
+                    const CvArr* mask CV_DEFAULT(NULL));
+
+/** dst(mask) = src(mask) + value */
+CVAPI(void)  cvAddS( const CvArr* src, CvScalar value, CvArr* dst,
+                     const CvArr* mask CV_DEFAULT(NULL));
+
+/** dst(mask) = src1(mask) - src2(mask) */
+CVAPI(void)  cvSub( const CvArr* src1, const CvArr* src2, CvArr* dst,
+                    const CvArr* mask CV_DEFAULT(NULL));
+
+/** dst(mask) = src(mask) - value = src(mask) + (-value) */
+void  cvSubS( const CvArr* src, CvScalar value, CvArr* dst,
+                         const CvArr* mask CV_DEFAULT(NULL));
+
+/** dst(mask) = value - src(mask) */
+CVAPI(void)  cvSubRS( const CvArr* src, CvScalar value, CvArr* dst,
+                      const CvArr* mask CV_DEFAULT(NULL));
+
+/** dst(idx) = src1(idx) * src2(idx) * scale
+   (scaled element-wise multiplication of 2 arrays) */
+CVAPI(void)  cvMul( const CvArr* src1, const CvArr* src2,
+                    CvArr* dst, double scale CV_DEFAULT(1) );
+
+/** element-wise division/inversion with scaling:
+    dst(idx) = src1(idx) * scale / src2(idx)
+    or dst(idx) = scale / src2(idx) if src1 == 0 */
+CVAPI(void)  cvDiv( const CvArr* src1, const CvArr* src2,
+                    CvArr* dst, double scale CV_DEFAULT(1));
+
+/** dst = src1 * scale + src2 */
+CVAPI(void)  cvScaleAdd( const CvArr* src1, CvScalar scale,
+                         const CvArr* src2, CvArr* dst );
+
+/** dst = src1 * alpha + src2 * beta + gamma */
+CVAPI(void)  cvAddWeighted( const CvArr* src1, double alpha,
+                            const CvArr* src2, double beta,
+                            double gamma, CvArr* dst );
+
+/** @brief Calculates the dot product of two arrays in Euclidean metrics.
+
+The function calculates and returns the Euclidean dot product of two arrays.
+
+\f[src1  \bullet src2 =  \sum _I ( \texttt{src1} (I)  \texttt{src2} (I))\f]
+
+In the case of multiple channel arrays, the results for all channels are accumulated. In particular,
+cvDotProduct(a,a) where a is a complex vector, will return \f$||\texttt{a}||^2\f$. The function can
+process multi-dimensional arrays, row by row, layer by layer, and so on.
+@param src1 The first source array
+@param src2 The second source array
+ */
+CVAPI(double)  cvDotProduct( const CvArr* src1, const CvArr* src2 );
+
+/** dst(idx) = src1(idx) & src2(idx) */
+CVAPI(void) cvAnd( const CvArr* src1, const CvArr* src2,
+                  CvArr* dst, const CvArr* mask CV_DEFAULT(NULL));
+
+/** dst(idx) = src(idx) & value */
+CVAPI(void) cvAndS( const CvArr* src, CvScalar value,
+                   CvArr* dst, const CvArr* mask CV_DEFAULT(NULL));
+
+/** dst(idx) = src1(idx) | src2(idx) */
+CVAPI(void) cvOr( const CvArr* src1, const CvArr* src2,
+                 CvArr* dst, const CvArr* mask CV_DEFAULT(NULL));
+
+/** dst(idx) = src(idx) | value */
+CVAPI(void) cvOrS( const CvArr* src, CvScalar value,
+                  CvArr* dst, const CvArr* mask CV_DEFAULT(NULL));
+
+/** dst(idx) = src1(idx) ^ src2(idx) */
+CVAPI(void) cvXor( const CvArr* src1, const CvArr* src2,
+                  CvArr* dst, const CvArr* mask CV_DEFAULT(NULL));
+
+/** dst(idx) = src(idx) ^ value */
+CVAPI(void) cvXorS( const CvArr* src, CvScalar value,
+                   CvArr* dst, const CvArr* mask CV_DEFAULT(NULL));
+
+/** dst(idx) = ~src(idx) */
+CVAPI(void) cvNot( const CvArr* src, CvArr* dst );
+
+/** dst(idx) = lower(idx) <= src(idx) < upper(idx) */
+CVAPI(void) cvInRange( const CvArr* src, const CvArr* lower,
+                      const CvArr* upper, CvArr* dst );
+
+/** dst(idx) = lower <= src(idx) < upper */
+CVAPI(void) cvInRangeS( const CvArr* src, CvScalar lower,
+                       CvScalar upper, CvArr* dst );
+
+/** The comparison operation support single-channel arrays only.
+   Destination image should be 8uC1 or 8sC1 */
+
+/** dst(idx) = src1(idx) _cmp_op_ src2(idx) */
+CVAPI(void) cvCmp( const CvArr* src1, const CvArr* src2, CvArr* dst, int cmp_op );
+
+/** dst(idx) = src1(idx) _cmp_op_ value */
+CVAPI(void) cvCmpS( const CvArr* src, double value, CvArr* dst, int cmp_op );
+
+/** dst(idx) = min(src1(idx),src2(idx)) */
+CVAPI(void) cvMin( const CvArr* src1, const CvArr* src2, CvArr* dst );
+
+/** dst(idx) = max(src1(idx),src2(idx)) */
+CVAPI(void) cvMax( const CvArr* src1, const CvArr* src2, CvArr* dst );
+
+/** dst(idx) = min(src(idx),value) */
+CVAPI(void) cvMinS( const CvArr* src, double value, CvArr* dst );
+
+/** dst(idx) = max(src(idx),value) */
+CVAPI(void) cvMaxS( const CvArr* src, double value, CvArr* dst );
+
+/** dst(x,y,c) = abs(src1(x,y,c) - src2(x,y,c)) */
+CVAPI(void) cvAbsDiff( const CvArr* src1, const CvArr* src2, CvArr* dst );
+
+/** dst(x,y,c) = abs(src(x,y,c) - value(c)) */
+CVAPI(void) cvAbsDiffS( const CvArr* src, CvArr* dst, CvScalar value );
 
 /****************************************************************************************\
 *                                   Dynamic Data structures                              *
@@ -1700,6 +1715,73 @@ typedef void (* Cv_iplAllocateImageData)(IplImage*,int,int);
 typedef void (* Cv_iplDeallocate)(IplImage*,int);
 typedef IplROI* (* Cv_iplCreateROI)(int,int,int,int,int);
 typedef IplImage* (* Cv_iplCloneImage)(const IplImage*);
+
+enum
+{
+/* 8bit, color or not */
+    CV_LOAD_IMAGE_UNCHANGED  =...,
+/* 8bit, gray */
+    CV_LOAD_IMAGE_GRAYSCALE  =...,
+/* ?, color */
+    CV_LOAD_IMAGE_COLOR      =...,
+/* any depth, ? */
+    CV_LOAD_IMAGE_ANYDEPTH   =...,
+/* ?, any color */
+    CV_LOAD_IMAGE_ANYCOLOR   =...
+};
+
+/* load image from file
+  iscolor can be a combination of above flags where CV_LOAD_IMAGE_UNCHANGED
+  overrides the other flags
+  using CV_LOAD_IMAGE_ANYCOLOR alone is equivalent to CV_LOAD_IMAGE_UNCHANGED
+  unless CV_LOAD_IMAGE_ANYDEPTH is specified images are converted to 8bit
+*/
+CVAPI(IplImage*) cvLoadImage( const char* filename, int iscolor CV_DEFAULT(CV_LOAD_IMAGE_COLOR));
+CVAPI(CvMat*) cvLoadImageM( const char* filename, int iscolor CV_DEFAULT(CV_LOAD_IMAGE_COLOR));
+
+enum
+{
+    CV_IMWRITE_JPEG_QUALITY =...,
+    CV_IMWRITE_JPEG_PROGRESSIVE =...,
+    CV_IMWRITE_JPEG_OPTIMIZE =...,
+    CV_IMWRITE_JPEG_RST_INTERVAL =...,
+    CV_IMWRITE_JPEG_LUMA_QUALITY =...,
+    CV_IMWRITE_JPEG_CHROMA_QUALITY =...,
+    CV_IMWRITE_PNG_COMPRESSION =...,
+    CV_IMWRITE_PNG_STRATEGY =...,
+    CV_IMWRITE_PNG_BILEVEL =...,
+    CV_IMWRITE_PNG_STRATEGY_DEFAULT =...,
+    CV_IMWRITE_PNG_STRATEGY_FILTERED =...,
+    CV_IMWRITE_PNG_STRATEGY_HUFFMAN_ONLY =...,
+    CV_IMWRITE_PNG_STRATEGY_RLE =...,
+    CV_IMWRITE_PNG_STRATEGY_FIXED =...,
+    CV_IMWRITE_PXM_BINARY =...,
+    CV_IMWRITE_WEBP_QUALITY =...
+};
+
+/* save image to file */
+CVAPI(int) cvSaveImage( const char* filename, const CvArr* image,
+                        const int* params CV_DEFAULT(0) );
+
+/* decode image stored in the buffer */
+CVAPI(IplImage*) cvDecodeImage( const CvMat* buf, int iscolor CV_DEFAULT(CV_LOAD_IMAGE_COLOR));
+CVAPI(CvMat*) cvDecodeImageM( const CvMat* buf, int iscolor CV_DEFAULT(CV_LOAD_IMAGE_COLOR));
+
+/* encode image and store the result as a byte vector (single-row 8uC1 matrix) */
+CVAPI(CvMat*) cvEncodeImage( const char* ext, const CvArr* image,
+                             const int* params CV_DEFAULT(0) );
+
+enum
+{
+    CV_CVTIMG_FLIP      =...,
+    CV_CVTIMG_SWAP_RB   =...
+};
+
+/* utility function: convert one image to another with optional vertical flip */
+CVAPI(void) cvConvertImage( const CvArr* src, CvArr* dst, int flags CV_DEFAULT(0));
+
+CVAPI(int) cvHaveImageReader(const char* filename);
+CVAPI(int) cvHaveImageWriter(const char* filename);
 
 /****************************************************************************************\
 *                         Working with Video Files and Cameras                           *
