@@ -34,6 +34,12 @@ class Window(object):
     def _show(self, image):
         lib.cvShowImage(self.name, image._cv_arr)
 
+    def show_until_keypress(self, image, delay=None):
+        self._show(image)
+        keycode = lib.cvWaitKey(0)
+        return _keycode_to_key(keycode)
+
+
     def loop_over(self, images, handle_input=lambda key : None, delay=25):
         for image in images:
             self._show(image)
@@ -43,9 +49,10 @@ class Window(object):
             if nothing_was_pressed:
                 continue
 
-            if 0 <= keycode <= 255:
-                key = chr(keycode)
-            else:
-                key = keycode
+            handle_input(key=_keycode_to_key(keycode))
 
-            handle_input(key=key)
+
+def _keycode_to_key(keycode):
+    if 0 <= keycode <= 255:
+        return chr(keycode)
+    return keycode
