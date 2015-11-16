@@ -27,4 +27,4 @@ class Camera(object):
             raise InitializationError(self)
         next_frame = partial(lib.cvQueryFrame, capture)
         for frame in iter(next_frame, None):
-            yield Image(ipl_image=frame)
+            yield Image(cv_arr=frame)

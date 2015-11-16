@@ -48,7 +48,7 @@ class HaarClassifier(object):
 
     def detect_objects(self, inside):
         objects = lib.cvHaarDetectObjects(
-            inside._ipl_image,
+            inside._cv_arr,
             self._cascade,
             self._storage,
             self._scale_factor,

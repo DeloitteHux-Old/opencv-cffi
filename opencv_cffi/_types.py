@@ -38,7 +38,7 @@ class Rectangle(object):
         shift=0,
     ):
         lib.cvRectangle(
-            frame._ipl_image,
+            frame._cv_arr,
             self.top_left,
             self.bottom_right,
             [[color.blue, color.green, color.red, color.alpha]],
